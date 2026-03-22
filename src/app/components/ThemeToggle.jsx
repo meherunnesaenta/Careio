@@ -1,6 +1,8 @@
 'use client'
 
 import { useEffect, useState } from "react";
+import { FaMoon } from "react-icons/fa";
+import { IoSunnySharp } from "react-icons/io5";
 
 const ThemeToggle = () => {
   const [theme, setTheme] = useState("carelight");
@@ -20,7 +22,7 @@ const ThemeToggle = () => {
 
   return (
     <button onClick={toggleTheme} className="btn btn-sm btn-primary">
-      {theme === "carelight" ? "🌙 Dark" : "☀️ Light"}
+      {theme === "carelight" ? <FaMoon /> : <IoSunnySharp />}
     </button>
   );
 };

@@ -9,7 +9,7 @@ const Loading = () => {
       {/* Logo */}
       <div className="animate-pulse">
         <Image
-          src='../../assets/logo.jpg'
+          src='/assets/logo.jpg'
           alt="Care.xyz"
           width={120}
           height={120}
