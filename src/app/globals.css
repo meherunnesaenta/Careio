@@ -1,26 +1,99 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@plugin "daisyui" {
+  themes: light --default, dark --prefersdark;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* 🌞 LIGHT THEME (Default) */
+@plugin "daisyui/theme" {
+  name: "carelight";
+  default: true;
+  prefersdark: false;
+  color-scheme: light;
+
+  /* Base */
+  --color-base-100: #F9FAFB;
+  --color-base-200: #F3F4F6;
+  --color-base-300: #E5E7EB;
+  --color-base-content: #111827;
+
+  /* Brand Colors */
+  --color-primary: #4F46E5; /* Indigo Blue */
+  --color-primary-content: #FFFFFF;
+
+  --color-secondary: #06B6D4; /* Cyan */
+  --color-secondary-content: #FFFFFF;
+
+  --color-accent: #F97316; /* Orange (CTA - logo match) */
+  --color-accent-content: #FFFFFF;
+
+  /* Neutral */
+  --color-neutral: #374151;
+  --color-neutral-content: #FFFFFF;
+
+  /* Status Colors */
+  --color-info: #3B82F6;
+  --color-info-content: #FFFFFF;
+
+  --color-success: #22C55E;
+  --color-success-content: #FFFFFF;
+
+  --color-warning: #F59E0B;
+  --color-warning-content: #111827;
+
+  --color-error: #EF4444;
+  --color-error-content: #FFFFFF;
+
+  /* UI Style */
+  --radius-selector: 0.75rem;
+  --radius-field: 0.5rem;
+  --radius-box: 1rem;
+
+  --border: 1px;
+  --depth: 1;
+  --noise: 0;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* 🌙 DARK THEME */
+@plugin "daisyui/theme" {
+  name: "caredark";
+  default: false;
+  prefersdark: true;
+  color-scheme: dark;
+
+  /* Base */
+  --color-base-100: #0F172A;
+  --color-base-200: #1E293B;
+  --color-base-300: #334155;
+  --color-base-content: #F9FAFB;
+
+  /* Brand Colors */
+  --color-primary: #6366F1;
+  --color-primary-content: #FFFFFF;
+
+  --color-secondary: #22D3EE;
+  --color-secondary-content: #0F172A;
+
+  --color-accent: #F97316;
+  --color-accent-content: #FFFFFF;
+
+  /* Neutral */
+  --color-neutral: #1E293B;
+  --color-neutral-content: #F9FAFB;
+
+  /* Status */
+  --color-info: #60A5FA;
+  --color-success: #4ADE80;
+  --color-warning: #FBBF24;
+  --color-error: #F87171;
+
+  /* UI Style */
+  --radius-selector: 0.75rem;
+  --radius-field: 0.5rem;
+  --radius-box: 1rem;
+
+  --border: 1px;
+  --depth: 1;
+  --noise: 0;
 }
