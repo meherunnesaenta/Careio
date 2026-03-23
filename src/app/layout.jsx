@@ -1,18 +1,10 @@
-import { Geist, Geist_Mono, Poppins } from "next/font/google";
+import { Poppins } from "next/font/google";
 import "./globals.css";
 import NextAuthSession from "@/provider/NextAuthSession";
 import Navbar from "./components/layout/Navbar";
 import Footer from "./components/layout/Footer";
+import ThemeProvider from "@/provider/ThemeProvider";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 const poppins = Poppins({
   weight: ['100', '200', '300', '400', '400', '500', '600']
@@ -26,10 +18,12 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <NextAuthSession>
-      <html lang="en">
+      <html lang="en" data-theme="carelight">
+
         <body
           className={`${poppins.className} antialiased`}
         >
+          <ThemeProvider></ThemeProvider>
           <header className="w-11/12 mx-auto p-2">
             <Navbar></Navbar>
           </header>

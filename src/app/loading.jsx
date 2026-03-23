@@ -17,19 +17,6 @@ const Loading = () => {
         />
       </div>
 
-      {/* Title */}
-      <h1 className="text-2xl font-bold text-primary mb-2">
-        Care.xyz
-      </h1>
-
-      {/* Subtitle */}
-      <p className="text-sm text-base-content/60 mb-6">
-        Trusted Care Services
-      </p>
-
-      {/* Loading Spinner */}
-      <span className="loading loading-spinner loading-lg text-accent"></span>
-
       {/* Optional Progress Bar */}
       <div className="w-48 mt-6">
         <progress className="progress progress-accent w-full"></progress>
