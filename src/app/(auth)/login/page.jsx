@@ -1,8 +1,11 @@
+import LoginFrom from '@/app/components/auth/LoginFrom';
 import React from 'react';
 
 const page = () => {
   return (
-    <div>page</div>
+    <div>
+        <LoginFrom></LoginFrom>
+    </div>
   );
 };
 

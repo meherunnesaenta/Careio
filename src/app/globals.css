@@ -1,10 +1,11 @@
 @import "tailwindcss";
 
+/* DaisyUI setup */
 @plugin "daisyui" {
-  themes: light --default, dark --prefersdark;
+  themes: carelight --default, caredark --prefersdark;
 }
 
-/* 🌞 LIGHT THEME (Default) */
+/* 🌞 LIGHT THEME */
 @plugin "daisyui/theme" {
   name: "carelight";
   default: true;
@@ -17,21 +18,21 @@
   --color-base-300: #E5E7EB;
   --color-base-content: #111827;
 
-  /* Brand Colors */
-  --color-primary: #4F46E5; /* Indigo Blue */
+  /* Brand */
+  --color-primary: #4F46E5;
   --color-primary-content: #FFFFFF;
 
-  --color-secondary: #06B6D4; /* Cyan */
+  --color-secondary: #06B6D4;
   --color-secondary-content: #FFFFFF;
 
-  --color-accent: #F97316; /* Orange (CTA - logo match) */
+  --color-accent: #F97316;
   --color-accent-content: #FFFFFF;
 
   /* Neutral */
   --color-neutral: #374151;
   --color-neutral-content: #FFFFFF;
 
-  /* Status Colors */
+  /* Status */
   --color-info: #3B82F6;
   --color-info-content: #FFFFFF;
 
@@ -44,7 +45,7 @@
   --color-error: #EF4444;
   --color-error-content: #FFFFFF;
 
-  /* UI Style */
+  /* UI */
   --radius-selector: 0.75rem;
   --radius-field: 0.5rem;
   --radius-box: 1rem;
@@ -53,7 +54,6 @@
   --depth: 1;
   --noise: 0;
 }
-
 
 /* 🌙 DARK THEME */
 @plugin "daisyui/theme" {
@@ -68,11 +68,11 @@
   --color-base-300: #334155;
   --color-base-content: #F9FAFB;
 
-  /* Brand Colors */
+  /* Brand */
   --color-primary: #6366F1;
   --color-primary-content: #FFFFFF;
 
-  --color-secondary: #22D3EE;
+  --color-secondary: rgb(34, 211, 238);
   --color-secondary-content: #0F172A;
 
   --color-accent: #F97316;
@@ -84,11 +84,18 @@
 
   /* Status */
   --color-info: #60A5FA;
-  --color-success: #4ADE80;
-  --color-warning: #FBBF24;
-  --color-error: #F87171;
+  --color-info-content: #0F172A;
 
-  /* UI Style */
+  --color-success: #4ADE80;
+  --color-success-content: #0F172A;
+
+  --color-warning: #FBBF24;
+  --color-warning-content: #0F172A;
+
+  --color-error: #F87171;
+  --color-error-content: #0F172A;
+
+  /* UI */
   --radius-selector: 0.75rem;
   --radius-field: 0.5rem;
   --radius-box: 1rem;
@@ -96,4 +103,28 @@
   --border: 1px;
   --depth: 1;
   --noise: 0;
+}
+
+/* 🌐 Global Styles */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-base-100 text-base-content;
+}
+
+/* ✨ Custom Utility */
+.container-custom {
+  @apply max-w-7xl mx-auto px-4;
+}
+
+/* Button smooth effect */
+.btn {
+  @apply transition duration-300 ease-in-out;
+}
+
+/* Card hover effect */
+.card {
+  @apply transition duration-300 hover:shadow-2xl;
 }
