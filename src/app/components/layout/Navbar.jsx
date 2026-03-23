@@ -8,6 +8,7 @@ const Navbar = () => {
     const link =<>
         <li><NavLink path='/'>Home</NavLink></li>
         <li><NavLink path='/service'>Service</NavLink></li>
+        <li><NavLink path='/about'>About</NavLink></li>
     </>
     return (
         <div className="navbar bg-base-100 shadow-sm">
