@@ -11,17 +11,16 @@ import {
   FaShieldAlt,
   FaUsers,
 } from 'react-icons/fa';
+import Heading from '../Heading/Heading';
 
 const About = () => {
   return (
-    <section className="py-16 md:py-24 bg-base-100">
+    <section className=" bg-base-100">
       <div className="container-custom mx-auto px-4">
         {/* Hero / Intro Section */}
         <div className="grid lg:grid-cols-2 gap-12 items-center mb-20">
           <div>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
-              About <span className="text-primary">Care.IO</span>
-            </h1>
+              <Heading>About Care.IO</Heading>
             <p className="text-xl md:text-2xl text-base-content/80 mb-8">
               We are dedicated to making caregiving simple, safe, and accessible for every family in Bangladesh.
             </p>

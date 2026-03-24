@@ -5,7 +5,7 @@ import About from "./components/home/About";
 
 export default function Home() {
   return (
-    <div>
+    <div  className="grid grid-cols-1 gap-15">
       <Banner></Banner>
       <About></About>
     </div>

@@ -17,7 +17,7 @@ const Loading = () => {
         />
       </div>
 
-      {/* Optional Progress Bar */}
+   
       <div className="w-48 mt-6">
         <progress className="progress progress-accent w-full"></progress>
       </div>

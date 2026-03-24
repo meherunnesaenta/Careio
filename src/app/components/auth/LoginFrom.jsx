@@ -1,25 +1,37 @@
 'use client';
 
 import React, { useState } from 'react';
-import { signIn } from "next-auth/react";
 import Link from 'next/link';
 import SocialLogin from '../Button/SocialLogin';
+import { loginUser } from '@/actions/server/auth';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
+  const router=useRouter();
+  const searchParams =useSearchParams();
+  const callbackUrl = searchParams.get('callbackUrl') || '/';
   const handleLogin = async (e) => {
     e.preventDefault();
-
-    const res = await signIn("credentials", {
-      email,
-      password,
-      redirect: true,
-      callbackUrl: "/"
-    });
-
-    console.log(res);
+ 
+    const form = e.target
+    const payload = {
+      email: form.email.value,
+      password: form.password.value
+    }
+    const result = await signIn("credentials", {
+    redirect: false, 
+    email,
+    password,
+  });
+    if (result) { 
+      alert("Login successful ✅");
+      router.push(callbackUrl)
+    } else {
+      alert("Invalid email or password ❌");
+    }
   };
 
 
@@ -42,7 +54,7 @@ const LoginForm = () => {
               <span className="label-text">Email</span>
             </label>
             <input
-              type="email"
+              type="email" name='email'
               placeholder="Enter your email"
               className="input input-bordered w-full"
               value={email}
@@ -57,7 +69,7 @@ const LoginForm = () => {
               <span className="label-text">Password</span>
             </label>
             <input
-              type="password"
+              type="password" name='password'
               placeholder="Enter your password"
               className="input input-bordered w-full"
               value={password}
@@ -82,7 +94,7 @@ const LoginForm = () => {
         {/* Extra */}
         <p className="text-sm text-center mt-4 text-base-content/60">
           Don’t have an account?{" "}
-          <Link href={'/register'} className="text-accent cursor-pointer">
+          <Link href={`/register?callbackUrl=${callbackUrl}`} className="text-accent cursor-pointer">
             Register
           </Link>
         </p>
