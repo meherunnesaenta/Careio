@@ -11,10 +11,10 @@ export const getService=async()=>{
     return result;
 }
 
-export const getSingleService=async(_id)=>{
-   if (!_id || _id.length !== 24) return null; 
+export const getSingleService=async(id)=>{
+   if (!id || id.length !== 24) return null; 
     
-    // const query ={_id:new ObjectId(_id)}
+    const query ={_id:new ObjectId(id)}
     const service =await serviceCollection.findOne(query);
     return {...service, _id:service._id.toString()||null};
 }

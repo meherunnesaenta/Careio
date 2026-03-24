@@ -9,7 +9,7 @@ const NotFound = () => {
       
       {/* Logo */}
       <Image
-        src="/assets/logo.jpg"
+        src="/assets/logo.png"
         alt="Care.xyz"
         width={100}
         height={100}

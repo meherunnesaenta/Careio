@@ -11,7 +11,7 @@ const ErrorPage = ({ error, reset }) => {
       
       {/* Logo */}
       <Image
-        src="/assets/logo.jpg" // ✅ public folder path
+        src="/assets/logo.png" // ✅ public folder path
         alt="Care.xyz Logo"
         width={120}
         height={120}

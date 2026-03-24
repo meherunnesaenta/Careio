@@ -13,7 +13,7 @@ const NavLink = ({ path, children }) => {
     <Link 
       href={path} 
       className={`
-        // ${isActive ? 'text-blue-600 font-bold border-b-2 border-blue-600' : 'text-gray-600 hover:text-blue-600'}
+        // ${isActive ? 'text-primary font-bold border-b-2 border-primary' : ' hover:text-secondary'}
       `}
     >
       {children}
