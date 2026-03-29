@@ -1,4 +1,4 @@
-import LoginFrom from '@/app/components/auth/LoginFrom';
+import LoginFrom from '@/app/components/from/LoginFrom';
 import React from 'react';
 
 const page = () => {

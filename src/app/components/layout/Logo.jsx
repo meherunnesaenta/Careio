@@ -8,11 +8,11 @@ const Logo = () => {
       <Image
         src='/assets/logo.png'
         alt="logo"
-        width={70}
-        height={70}
-        className="w-20 h-auto"
+        width={80}
+        height={80}
+        className="w-15 h-auto"
       />
-      <p className='text-sm font-bold'>Car.<span className='text-accent'>io</span></p>
+      <p className='text-sm font-bold'>Care.<span className='text-accent'>io</span></p>
     </Link>
   );
 };

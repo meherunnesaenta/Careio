@@ -1,7 +1,26 @@
 import { getSingleService } from '@/actions/server/service';
 import BookNow from '@/app/components/Button/BookNow';
+import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
+
+// Dynamic metadata (recommended)
+export async function generateMetadata({ params }) {
+  const resolvedParams = await params;
+  const service = await getSingleService(resolvedParams.id); 
+
+  return {
+    title: `${service?.name || "Service"} - Care Bangladesh`,
+    description: service?.description 
+      ? service.description.substring(0, 160) 
+      : "Book professional home care service with trusted caregivers.",
+    openGraph: {
+      title: service?.name || "Service Details",
+      description: service?.description || "",
+      images: [{ url: service?.image || "https://i.ibb.co/hJPcXLsq/image.png" }],
+    },
+  };
+}
 
 const ServiceDetails = async ({ params }) => {
   const { id } = await params;
@@ -19,9 +38,11 @@ const ServiceDetails = async ({ params }) => {
 
         {/* 🔹 Image Section */}
         <div className="rounded-2xl overflow-hidden shadow-lg">
-          <img
+          <Image
             src={service.image}
             alt={service.name}
+            width={800}
+            height={350}
             className="w-full h-[350px] object-cover"
           />
         </div>
@@ -71,7 +92,7 @@ const ServiceDetails = async ({ params }) => {
 
           {/* Actions */}
           <div className="flex gap-3">
-              <BookNow service={{...service,id:service._id.toString()}}></BookNow>
+            <BookNow service={{...service, id: service._id }}></BookNow>
 
             <button className="btn btn-outline btn-secondary">
               Contact

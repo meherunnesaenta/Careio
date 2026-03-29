@@ -128,3 +128,5 @@ body {
 .card {
   @apply transition duration-300 hover:shadow-2xl;
 }
+
+
