@@ -16,7 +16,7 @@ const getBookingCollection = async () => {
 
 export const createBooking = async (payload) => {
     try {
-        const { userId, serviceId, image, category, location, serviceDate, totalAmount = 0 } = payload;
+        const { userId, serviceId, image, category, location, serviceDate,price, totalAmount = 0 } = payload;
 
         console.log("🔹 createBooking called with payload:", payload);
 
@@ -34,6 +34,8 @@ export const createBooking = async (payload) => {
             category: category || "",
             location,
             serviceDate,
+            quantity: 1,
+            price,
             totalAmount: Number(totalAmount),
             status: 'pending',
             createdAt: new Date()
@@ -50,7 +52,7 @@ export const createBooking = async (payload) => {
 
     } catch (error) {
         console.error("Create Booking Error:", error);
-        return { 
+        return {  
             acknowledged: false, 
             message: error.message || "Database error" 
         };
@@ -66,10 +68,14 @@ export const isExistingBooking = async (serviceId) => {
 
         const query = { 
             userId: user.user.email, 
-            serviceId: serviceId 
+            serviceId: String(serviceId) // ✅ নিশ্চিত করো
         };
 
         const existing = await collection.findOne(query);
+
+        console.log("Query:", query);
+        console.log("Found:", existing);
+
         return Boolean(existing);
     } catch (error) {
         console.error("isExistingBooking Error:", error);
@@ -96,24 +102,28 @@ export const getBooking = async () => {
     }
 };
 
+
 export const updateBooking = async (service, inc = true) => {
     try {
         const user = await getServerSession(authOptions);
-        if (!user?.user?.email || !service?._id) return { success: false };
+        if (!user?.user?.email) return { success: false };
 
         const collection = await getBookingCollection();
 
-        const query = { 
-            userId: user.user.email, 
-            serviceId: service._id 
-        };
+        const price = Number(service?.price || 0);
 
-        const updateData = {
-            $inc: { quantity: inc ? 1 : -1 }
-        };
+        const result = await collection.updateOne(
+            { userId: user.user.email, serviceId: service.serviceId },
+            {
+                $inc: {
+                    quantity: inc ? 1 : -1,
+                    totalAmount: inc ? price : -price
+                }
+            }
+        );
 
-        const result = await collection.updateOne(query, updateData);
         return { success: Boolean(result.modifiedCount) };
+
     } catch (error) {
         console.error("Update Booking Error:", error);
         return { success: false };

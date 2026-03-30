@@ -1,6 +1,7 @@
 'use client';
 
 import { createBooking, isExistingBooking } from '@/actions/server/booking';
+import { redirect } from 'next/dist/server/api-utils';
 import React, { useState, useEffect } from 'react';
 
 const BookingForm = ({ service, session }) => {
@@ -40,10 +41,11 @@ const BookingForm = ({ service, session }) => {
 
         const payload = {
             userId: session?.user?.email,
-            serviceId: service?._id || service?.id,
+            serviceId: String(service?._id || service?.id),
             image: service?.image || "",
             category: service?.category || "",
-
+            quantity: 1,
+            price: service?.price || 0,
             region: formData.get('region'),
             district: formData.get('district'),
             city: formData.get('city'),
@@ -69,13 +71,13 @@ const BookingForm = ({ service, session }) => {
             if (result?.acknowledged === true) {
                 alert("🎉 Booking Created Successfully! Status: Pending");
                 // Optional: Refresh the page or redirect
-                window.location.reload(); 
+                window.location.reload();
             } else {
                 alert("❌ Booking Failed: " + (result?.message || "Unknown error"));
             }
         } catch (error) {
             console.error("❌ Create Booking Error:", error);
-            alert("Booking Failed! Check console for details.");
+            redirect('/myBookings');
         } finally {
             setLoading(false);
         }
@@ -84,7 +86,7 @@ const BookingForm = ({ service, session }) => {
     return (
         <div className="card bg-base-100 shadow-2xl">
             <div className="card-body p-8">
-                <h2 className="text-2xl font-semibold mb-6">Fill Booking Information</h2>
+                <h2 className="text-2xl font-semibold text-secondary mb-6">Fill Booking Information</h2>
 
                 <form onSubmit={handleBooking} className="space-y-6">
                     <div>
@@ -141,10 +143,10 @@ const BookingForm = ({ service, session }) => {
 
                     <button
                         type="submit"
-                        disabled={loading || checking}
+                        disabled={loading || checking || isExisting}
                         className="btn btn-primary w-full h-14 text-lg mt-8"
                     >
-                        {loading ? "Creating Booking..." : "Confirm Booking"}
+                        {isExisting ? "Already Booked" : loading ? "Creating Booking..." : "Confirm Booking"}
                     </button>
                 </form>
 

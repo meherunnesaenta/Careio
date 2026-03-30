@@ -53,9 +53,7 @@ const About = () => {
 
         {/* Why Choose Care.IO - Stats / Features */}
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Why Families Trust Care.IO
-          </h2>
+          <Heading> Why Families Trust Care.IO</Heading>
           <p className="text-lg text-base-content/70 max-w-3xl mx-auto">
             We go beyond just providing care — we build peace of mind for families.
           </p>
@@ -96,10 +94,10 @@ const About = () => {
         {/* Our Values / Story */}
         <div className="mt-20 grid lg:grid-cols-2 gap-12 items-center">
           <div className="order-2 lg:order-1">
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">Our Core Values</h2>
+            <Heading>Our Core Values</Heading>
             <ul className="space-y-6 text-lg">
               <li className="flex items-start gap-4">
-                <FaHeart className="text-3xl text-success mt-1 flex-shrink-0" />
+                <FaHeart className="text-3xl text-accent mt-1 flex-shrink-0" />
                 <div>
                   <h4 className="font-semibold text-xl">Compassion First</h4>
                   <p className="text-base-content/70">
@@ -108,7 +106,7 @@ const About = () => {
                 </div>
               </li>
               <li className="flex items-start gap-4">
-                <FaShieldAlt className="text-3xl text-success mt-1 flex-shrink-0" />
+                <FaShieldAlt className="text-3xl text-accent mt-1 flex-shrink-0" />
                 <div>
                   <h4 className="font-semibold text-xl">Safety & Trust</h4>
                   <p className="text-base-content/70">
@@ -117,7 +115,7 @@ const About = () => {
                 </div>
               </li>
               <li className="flex items-start gap-4">
-                <FaUsers className="text-3xl text-success mt-1 flex-shrink-0" />
+                <FaUsers className="text-3xl text-accent mt-1 flex-shrink-0" />
                 <div>
                   <h4 className="font-semibold text-xl">Family-Centered</h4>
                   <p className="text-base-content/70">
@@ -131,7 +129,7 @@ const About = () => {
           {/* Right image for values section */}
           <div className="relative rounded-2xl overflow-hidden shadow-2xl order-1 lg:order-2">
             <Image
-              src="/assets/about2.png" // change to your actual image path
+              src={'/assets/about2.png'} 
               alt="Happy multi-generational family portrait"
               width={1200}
               height={800}
@@ -141,14 +139,12 @@ const About = () => {
         </div>
 
         {/* Final CTA */}
-        <div className="text-center mt-20 py-12 bg-base-200 rounded-3xl">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            Ready to Experience Peace of Mind?
-          </h2>
+        <div className="text-center mt-20 py-12 bg-accent/20 rounded-3xl">
+            <Heading> Ready to Experience Peace of Mind?</Heading>
           <p className="text-xl mb-8 max-w-3xl mx-auto">
             Join hundreds of families who trust Care.IO for their loved ones' care.
           </p>
-          <Link href="/booking" className="btn btn-primary btn-lg px-12">
+          <Link href="/myBooking" className="btn btn-primary btn-lg px-12">
             Get Started Today
           </Link>
         </div>
