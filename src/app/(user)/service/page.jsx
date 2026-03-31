@@ -1,6 +1,6 @@
 import React from 'react';
-import Heading from '../components/Heading/Heading';
-import Service from '../components/Service/Service';
+import Heading from '@/app/components/Heading/Heading';
+import Service from '@/app/components/Service/Service';
 export const metadata = {
   title: "Our Services - Care Bangladesh",
   description: "Explore all home care services: Elderly Care, Nursing, Patient Care, Housekeeping, and more. Book now!",

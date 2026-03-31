@@ -1,11 +1,11 @@
 import { getBooking } from '@/actions/server/booking';
 import { getServerSession } from 'next-auth';
 import { redirect } from 'next/navigation';
-import BookingCard from '../components/Card/BookingCard';
-import Heading from '../components/Heading/Heading';
+import BookingCard from '../../components/Card/BookingCard';
+import Heading from '../../components/Heading/Heading';
 
 
-const page = async () => {
+const MyBooking = async () => {
   const session = await getServerSession();
 
   if (!session) {
@@ -35,4 +35,4 @@ const page = async () => {
   );
 };
 
-export default page;
+export default MyBooking;

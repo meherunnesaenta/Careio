@@ -1,6 +1,7 @@
 import { getService } from '@/actions/server/service';
+import ServiceCardSkeleton from '@/app/components/skeleton/ServiceCardSkeleton';
 import React from 'react';
-import ServiceCardSkeleton from '../components/skeleton/ServiceCardSkeleton';
+
 
 const loading = async() => {
     const services=await getService()

@@ -30,15 +30,7 @@ export default function RootLayout({ children }) {
           className={`${poppins.className} antialiased`}
         >
           <ThemeProvider></ThemeProvider>
-          <header className="w-11/12 mx-auto p-2">
-            <Navbar></Navbar>
-          </header>
-          <main className="w-11/12 mx-auto p-2">
-            {children}
-          </main>
-          <footer >
-            <Footer></Footer>
-          </footer>
+          {children}
         </body>
       </html>
     </NextAuthSession>

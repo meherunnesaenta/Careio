@@ -3,25 +3,24 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import SocialLogin from '../Button/SocialLogin';
-import { loginUser } from '@/actions/server/auth';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { signIn } from 'next-auth/react';
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const router=useRouter();
-  const searchParams =useSearchParams();
+  const [error, setError] = useState('');
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const callbackUrl = searchParams.get('callbackUrl') || '/';
   const handleLogin = async (e) => {
     e.preventDefault();
 
     const result = await signIn('credentials', {
-      email: e.target.email.value,
-      password: e.target.password.value,
+      email,
+      password,
       redirect: false
-    },
-    )
+    });
     if (result?.error) {
       setError(
         result.error === 'CredentialsSignin'
@@ -84,6 +83,7 @@ const LoginForm = () => {
           </button>
 
         </form>
+        {error && <p className="text-error text-sm mt-2">{error}</p>}
 
         {/* Divider */}
         <div className="divider">OR</div>

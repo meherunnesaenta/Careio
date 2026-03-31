@@ -2,7 +2,7 @@ import React from 'react';
 import Logo from './Logo';
 import NavLink from '../Button/NavLink';
 import ThemeToggleButton from '../Button/ThemeToggleButton';
-import AuthLogin from '../Button/AuthLogin';
+import DashBoard from './DashBoard';
 
 const Navbar = () => {
     const link =<>
@@ -32,7 +32,7 @@ const Navbar = () => {
             </div>
             <div className="navbar-end">
                 <ThemeToggleButton></ThemeToggleButton>
-                <AuthLogin></AuthLogin>
+                    <DashBoard></DashBoard>
             </div>
         </div>
     );
