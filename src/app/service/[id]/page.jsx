@@ -95,7 +95,7 @@ const ServiceDetails = async ({ params }) => {
             <BookNow service={{...service, id: service._id }}></BookNow>
 
             <button className="btn btn-outline btn-secondary">
-              Contact
+              pay
             </button>
           </div>
         </div>

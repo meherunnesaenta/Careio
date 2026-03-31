@@ -3,6 +3,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/authoption";
 import { connect } from "@/lib/dbconnect";
+import { ObjectId } from "mongodb";
 
 // Global collection (lazy loading)
 let bookingCollection = null;
@@ -18,7 +19,6 @@ export const createBooking = async (payload) => {
     try {
         const { userId, serviceId, image, category, location, serviceDate,price, totalAmount = 0 } = payload;
 
-        console.log("🔹 createBooking called with payload:", payload);
 
         if (!userId || !serviceId || !location || !serviceDate) {
             return { 
@@ -51,7 +51,6 @@ export const createBooking = async (payload) => {
         };
 
     } catch (error) {
-        console.error("Create Booking Error:", error);
         return {  
             acknowledged: false, 
             message: error.message || "Database error" 
@@ -68,17 +67,14 @@ export const isExistingBooking = async (serviceId) => {
 
         const query = { 
             userId: user.user.email, 
-            serviceId: String(serviceId) // ✅ নিশ্চিত করো
+            serviceId: String(serviceId) 
         };
 
         const existing = await collection.findOne(query);
 
-        console.log("Query:", query);
-        console.log("Found:", existing);
-
         return Boolean(existing);
     } catch (error) {
-        console.error("isExistingBooking Error:", error);
+      
         return false;
     }
 };
@@ -97,7 +93,7 @@ export const getBooking = async () => {
             _id: item._id.toString()
         }));
     } catch (error) {
-        console.error("Get Booking Error:", error);
+      
         return [];
     }
 };
@@ -125,7 +121,27 @@ export const updateBooking = async (service, inc = true) => {
         return { success: Boolean(result.modifiedCount) };
 
     } catch (error) {
-        console.error("Update Booking Error:", error);
+        
+        return { success: false };
+    }
+};
+
+export const deleteBooking = async (bookingId) => {
+    try {
+        const user = await getServerSession(authOptions);
+        if (!user?.user?.email) return { success: false };
+
+        const collection = await getBookingCollection();
+
+        const result = await collection.deleteOne({ 
+            _id: new ObjectId(bookingId),   
+            userId: user.user.email 
+        });
+
+        return { success: Boolean(result.deletedCount) };
+
+    } catch (error) {
+        console.error("Delete Booking Error:", error);
         return { success: false };
     }
 };

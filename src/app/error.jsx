@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 const ErrorPage = ({ error, reset }) => {
-  console.error(error); // console log for dev
+
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-base-100 px-4 text-center">

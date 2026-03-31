@@ -2,30 +2,31 @@
 
 import { updateBooking } from '@/actions/server/booking';
 import React, { useState } from 'react';
+import RemoveCard from '../Button/RemoveCard';
 
 const BookingCard = ({ booking }) => {
-const [quantity, setQuantity] = useState(booking.quantity || 1);
-const [total, setTotal] = useState(booking.totalAmount || 0);
+  const [quantity, setQuantity] = useState(booking.quantity || 1);
+  const [total, setTotal] = useState(booking.totalAmount || 0);
 
-const handleInc = async () => {
-  const res = await updateBooking(booking, true);
+  const handleInc = async () => {
+    const res = await updateBooking(booking, true);
 
-  if (res?.success) {
-    setQuantity(prev => prev + 1);
-    setTotal(prev => prev + booking.price);
-  }
-};
+    if (res?.success) {
+      setQuantity(prev => prev + 1);
+      setTotal(prev => prev + booking.price);
+    }
+  };
 
-const handleDec = async () => {
-  if (quantity <= 1) return;
+  const handleDec = async () => {
+    if (quantity <= 1) return;
 
-  const res = await updateBooking(booking, false);
+    const res = await updateBooking(booking, false);
 
-  if (res?.success) {
-    setQuantity(prev => prev - 1);
-    setTotal(prev => prev - booking.price);
-  }
-};
+    if (res?.success) {
+      setQuantity(prev => prev - 1);
+      setTotal(prev => prev - booking.price);
+    }
+  };
 
   return (
     <div className="card bg-base-200 shadow-xl p-4 flex flex-col md:flex-row gap-9">
@@ -65,22 +66,24 @@ const handleDec = async () => {
         </div>
 
         {/* Price */}
-       
+
       </div>
 
-       <div className="mt-3 flex-1">
-          <p className="text-sm opacity-70">
-            Price: ৳{booking.price} × {quantity}
-          </p>
-          <p className="text-lg font-bold text-primary">
-            Total: ৳{total}
-          </p>
-        </div>
+      <div className="mt-3 flex-1">
+        <p className="text-sm opacity-70">
+          Price: ৳{booking.price} × {quantity}
+        </p>
+        <p className="text-lg font-bold text-primary">
+          Total: ৳{total}
+        </p>
+      </div>
 
       {/* Action */}
       <div className="flex md:flex-col justify-between items-end gap-2">
-        <button className="btn btn-primary btn-sm">View</button>
-        <button className="btn btn-error btn-sm">Remove</button>
+        <button className="btn btn-outline btn-secondary">
+          pay
+        </button>
+        <RemoveCard booking={booking} />
       </div>
     </div>
   );

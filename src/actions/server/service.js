@@ -12,10 +12,10 @@ export const getService=async()=>{
 }
 
 export const getSingleService = async (id) => {
-  console.log("🔹 getSingleService called with id:", id); 
+ 
 
   if (!id) {
-    console.log("❌ No id provided");
+
     return null;
   }
 
@@ -23,13 +23,13 @@ export const getSingleService = async (id) => {
   try {
     objectId = new ObjectId(id);
   } catch (error) {
-    console.log("❌ Invalid ObjectId format:", id);
+  
     return null;
   }
 
   const service = await serviceCollection.findOne({ _id: objectId });
   if (!service) {
-    console.log("❌ No service found for this id:", id);
+    
     return null;
   }
 

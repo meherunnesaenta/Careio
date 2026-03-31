@@ -1,37 +1,17 @@
 'use client';
 
 import { createBooking, isExistingBooking } from '@/actions/server/booking';
-import { redirect } from 'next/dist/server/api-utils';
+
+import { useRouter } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
 
 const BookingForm = ({ service, session }) => {
 
-    const [isExisting, setIsExisting] = useState(false);
+    const { user } = session || {};
     const [loading, setLoading] = useState(false);
-    const [checking, setChecking] = useState(true);
 
-    // Check if booking already exists
-    useEffect(() => {
-        const checkExisting = async () => {
-            if (!service?._id && !service?.id) {
-                setChecking(false);
-                return;
-            }
+    const router = useRouter();
 
-            try {
-                const exists = await isExistingBooking(service?._id || service?.id);
-                setIsExisting(exists);
-                console.log("Existing booking check:", exists); // Debugging
-            } catch (error) {
-                console.error("Error checking existing booking:", error);
-                setIsExisting(false);
-            } finally {
-                setChecking(false);
-            }
-        };
-
-        checkExisting();
-    }, [service]);
 
     const handleBooking = async (e) => {
         e.preventDefault();
@@ -40,7 +20,8 @@ const BookingForm = ({ service, session }) => {
         const formData = new FormData(e.currentTarget);
 
         const payload = {
-            userId: session?.user?.email,
+            userId: user?.email,
+            userName: user?.name,
             serviceId: String(service?._id || service?.id),
             image: service?.image || "",
             category: service?.category || "",
@@ -62,25 +43,20 @@ const BookingForm = ({ service, session }) => {
             }
         };
 
-        console.log("📦 Final Payload Sent:", payload);
 
-        try {
-            const result = await createBooking(payload);
-            console.log("✅ Booking Result:", result);
+        const result = await createBooking(payload);
 
-            if (result?.acknowledged === true) {
-                alert("🎉 Booking Created Successfully! Status: Pending");
-                // Optional: Refresh the page or redirect
-                window.location.reload();
-            } else {
-                alert("❌ Booking Failed: " + (result?.message || "Unknown error"));
-            }
-        } catch (error) {
-            console.error("❌ Create Booking Error:", error);
-            redirect('/myBookings');
-        } finally {
-            setLoading(false);
+
+        if (result?.acknowledged === true) {
+            alert("🎉 Booking Created Successfully! Status: Pending");
+
+            router.push('/myBooking');
+           
+
+        } else {
+            alert("❌ Booking Failed: " + (result?.message || "Unknown error"));
         }
+         setLoading(false);
     };
 
     return (
@@ -88,8 +64,37 @@ const BookingForm = ({ service, session }) => {
             <div className="card-body p-8">
                 <h2 className="text-2xl font-semibold text-secondary mb-6">Fill Booking Information</h2>
 
+
+
                 <form onSubmit={handleBooking} className="space-y-6">
+                    <div className=' flex flex-col md:flex-row gap-7'>
+                        <div>
+                            <label className="label">
+                                <span className="label-text font-medium">Full Name</span>
+                            </label>
+                            <input
+                                type="text"
+                                name="fullName"
+                                value={user?.name || ''}
+                                className="input input-bordered w-full  cursor-not-allowed"
+                                disabled
+                            />
+                        </div>
+                        <div>
+                            <label className="label">
+                                <span className="label-text font-medium">Email</span>
+                            </label>
+                            <input
+                                type="email"
+                                name="email"
+                                value={user?.email || ''}
+                                className="input input-bordered w-full  cursor-not-allowed"
+                                disabled
+                            />
+                        </div>
+                    </div>
                     <div>
+
                         <label className="label">
                             <span className="label-text font-medium">Region</span>
                         </label>
@@ -143,15 +148,15 @@ const BookingForm = ({ service, session }) => {
 
                     <button
                         type="submit"
-                        disabled={loading || checking || isExisting}
+                        disabled={loading}
                         className="btn btn-primary w-full h-14 text-lg mt-8"
                     >
-                        {isExisting ? "Already Booked" : loading ? "Creating Booking..." : "Confirm Booking"}
+                        Confirm Booking
                     </button>
                 </form>
 
                 <p className="text-center text-sm text-base-content/60 mt-6">
-                    Booking will be saved with <span className="text-warning font-medium">Pending</span> status
+                    Booking will be saved. <span className="text-warning font-medium">Admin will review</span> the booking.
                 </p>
             </div>
         </div>
