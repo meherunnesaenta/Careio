@@ -164,28 +164,7 @@ const DashBoardLayout = ({ children }) => {
             <Logo />
           </div>
           
-          <div className="flex-none gap-2">
-            {/* User Info */}
-            {session?.user && (
-              <div className="dropdown dropdown-end">
-                <label tabIndex={0} className="btn btn-ghost btn-circle avatar placeholder">
-                  <div className="bg-neutral text-neutral-content rounded-full w-10">
-                    <span className="text-sm">
-                      {session.user.name?.charAt(0) || session.user.email?.charAt(0)}
-                    </span>
-                  </div>
-                </label>
-                <ul tabIndex={0} className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52">
-                  <li className="menu-title">
-                    <span>{session.user.email}</span>
-                  </li>
-                  <li><Link href="/dashboard/profile">Profile</Link></li>
-                  <li><Link href="/dashboard/settings">Settings</Link></li>
-                  <li><div className="text-error"><AuthLogin /></div></li>
-                </ul>
-              </div>
-            )}
-          </div>
+
         </nav>
 
         {/* Main Content */}

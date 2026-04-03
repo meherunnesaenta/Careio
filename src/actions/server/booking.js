@@ -98,6 +98,19 @@ export const getBooking = async () => {
     }
 };
 
+export const getBookingByEmail = async (email) => {
+    try {
+        if (!email) return { acknowledged: false, message: 'Email is required' };
+        const collection = await getBookingCollection();
+        const bookings = await collection.find({ userId: email }).toArray();
+        return bookings ;
+    }
+    catch (error) {
+        return { acknowledged: false, message: error.message || 'Database error' };
+    }
+};
+
+
 
 export const updateBooking = async (service, inc = true) => {
     try {
