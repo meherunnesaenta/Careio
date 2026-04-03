@@ -3,6 +3,7 @@
 import { updateBooking } from '@/actions/server/booking';
 import React, { useState } from 'react';
 import RemoveCard from '../Button/RemoveCard';
+import Pay from '../Button/Pay';
 
 const BookingCard = ({ booking }) => {
   const [quantity, setQuantity] = useState(booking.quantity || 1);
@@ -80,9 +81,7 @@ const BookingCard = ({ booking }) => {
 
       {/* Action */}
       <div className="flex md:flex-col justify-between items-end gap-2">
-        <button className="btn btn-outline btn-secondary">
-          pay
-        </button>
+        <Pay booking={booking}></Pay>
         <RemoveCard booking={booking} />
       </div>
     </div>

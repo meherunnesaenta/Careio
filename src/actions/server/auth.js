@@ -2,22 +2,22 @@
 const { connect } = require("@/lib/dbconnect");
 import bcrypt from "bcrypt";
 
-const userCollection =await connect('users');
+const userCollection = await connect('users');
 
-export const postUser=async(payload)=>{
-    const {name, email, password }=payload;
-    if(!email || !password) return null;
+export const postUser = async (payload) => {
+    const { name, email, password } = payload;
+    if (!email || !password) return null;
 
-    const isExist =await userCollection.findOne({email});
-    if(isExist){
+    const isExist = await userCollection.findOne({ email });
+    if (isExist) {
         return { acknowledged: false, message: 'Email already exists' };
     }
 
-    const newUser={
-        provider:'credentials',
+    const newUser = {
+        provider: 'credentials',
         name,
         email,
-        password: await bcrypt.hash(password,10) ,
+        password: await bcrypt.hash(password, 10),
         role: 'user'
     }
 
@@ -26,29 +26,46 @@ export const postUser=async(payload)=>{
     if (result.acknowledged) {
         return {
             acknowledged: true,
-            insertId: result.insertedId.toString() 
+            insertId: result.insertedId.toString()
         }
     }
 
     return { acknowledged: false };
 }
 
-export const loginUser= async(payload)=>{
-        const { email, password }=payload;
-    if(!email || !password) return null;
+export const loginUser = async (payload) => {
+    const { email, password } = payload;
+    if (!email || !password) return null;
 
-    const user =await userCollection.findOne({email});
-    if(!user){
+    const user = await userCollection.findOne({ email });
+    if (!user) {
         return null
     }
 
-    const isExist = await bcrypt.compare(password,user.password )
+    const isExist = await bcrypt.compare(password, user.password)
 
-    if(isExist){
-        return {...user,_id:user._id.toString()}
+    if (isExist) {
+        return { ...user, _id: user._id.toString() }
     }
-    else{
+    else {
         return null;
     }
+}
+
+export const updateRole = async (email) => {
+   if(!email)return null;
+   const newRole ={
+    $set:{
+        role: 'worker'
+    }
+   }
+   const result = await userCollection.updateOne({email:email},newRole);
+   if (result.matchedCount === 0) {
+      return { success: false, message: "User not found" };
+    }
+    return { 
+      success: true, 
+      message: "Role updated to worker successfully" 
+    };
 }
 

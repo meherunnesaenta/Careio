@@ -9,7 +9,7 @@ export const metadata = {
     title: "Book Service - Care",
     description: "Complete your booking for professional home care service. Choose duration, location and confirm instantly.",
     robots: {
-        index: false,        // Booking page সাধারণত index করা হয় না
+        index: false,        
         follow: false,
     },
     openGraph: {
