@@ -5,10 +5,10 @@ import Footer from '../components/layout/Footer';
 const UserLayout = ({ children }) => {
     return (
         <div>
-            <header className="w-11/12 mx-auto p-2">
+            <header className="w-11/12 mx-auto">
                 <Navbar></Navbar>
             </header>
-            <main className="w-11/12 mx-auto p-2" >
+            <main className="w-11/12 mx-auto " >
                 {children}
             </main>
             <footer >

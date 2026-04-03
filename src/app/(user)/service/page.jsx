@@ -15,7 +15,14 @@ export const metadata = {
 const ServicePage = () => {
   return (
     <div className="">
-      <Heading  >Our Services</Heading>
+        <Heading 
+          center={true}
+        >
+          Our {' '}
+          <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+            Services
+          </span>
+        </Heading>
       <Service />
     </div>
   );

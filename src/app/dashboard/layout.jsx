@@ -1,382 +1,276 @@
 'use client'
 import React from 'react';
-
 import Link from 'next/link';
 import Logo from '../components/layout/Logo';
 import { useSession } from 'next-auth/react';
 import AuthLogin from '../components/Button/AuthLogin';
 
+// Icon components for better organization
+const Icons = {
+  Home: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2h-5v-8H7v8H5a2 2 0 0 1-2-2z" />
+    </svg>
+  ),
+  Profile: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+      <circle cx="12" cy="7" r="4" />
+    </svg>
+  ),
+  Booking: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+      <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+      <line x1="16" y1="2" x2="16" y2="6" />
+      <line x1="8" y1="2" x2="8" y2="6" />
+      <line x1="3" y1="10" x2="21" y2="10" />
+      <path d="M8 14h.01" />
+      <path d="M12 14h.01" />
+      <path d="M16 14h.01" />
+      <path d="M8 18h.01" />
+      <path d="M12 18h.01" />
+      <path d="M16 18h.01" />
+    </svg>
+  ),
+  Payment: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+      <rect x="2" y="5" width="20" height="14" rx="2" />
+      <line x1="2" y1="10" x2="22" y2="10" />
+      <line x1="7" y1="15" x2="7.01" y2="15" />
+      <line x1="12" y1="15" x2="12.01" y2="15" />
+    </svg>
+  ),
+  Task: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+      <polyline points="14 2 14 8 20 8" />
+      <line x1="16" y1="13" x2="8" y2="13" />
+      <line x1="16" y1="17" x2="8" y2="17" />
+      <polyline points="10 9 9 9 8 9" />
+    </svg>
+  ),
+  Worker: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+      <circle cx="12" cy="7" r="4" />
+      <path d="M12 3v2" />
+      <path d="M15 6l-1.5 1.5" />
+      <path d="M9 6l1.5 1.5" />
+    </svg>
+  ),
+  Logout: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+      <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+      <polyline points="16 17 21 12 16 7" />
+      <line x1="21" y1="12" x2="9" y2="12" />
+    </svg>
+  ),
+  Menu: () => (
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
+      <line x1="3" y1="12" x2="21" y2="12" />
+      <line x1="3" y1="6" x2="21" y2="6" />
+      <line x1="3" y1="18" x2="21" y2="18" />
+    </svg>
+  ),
+};
+
+// Sidebar Item Component
+const SidebarItem = ({ href, icon: Icon, label, isCollapsed }) => (
+  <li>
+    <Link 
+      href={href} 
+      className={`group relative flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-base-300 ${
+        isCollapsed ? 'justify-center' : ''
+      }`}
+      data-tip={isCollapsed ? label : undefined}
+    >
+      <Icon />
+      {!isCollapsed && <span>{label}</span>}
+    </Link>
+  </li>
+);
+
+// Sidebar Section Component
+const SidebarSection = ({ items, isCollapsed }) => (
+  <ul className="menu w-full space-y-1 p-2">
+    {items.map((item, index) => (
+      <SidebarItem key={index} {...item} isCollapsed={isCollapsed} />
+    ))}
+  </ul>
+);
 
 const DashBoardLayout = ({ children }) => {
   const { data: session, status } = useSession();
+  const [isCollapsed, setIsCollapsed] = React.useState(false);
+
+  // Navigation items based on user role
+  const getNavItems = () => {
+    const commonItems = [
+      { href: "/", icon: Icons.Home, label: "Home" },
+      { href: "/dashboard/profile", icon: Icons.Profile, label: "Profile" },
+      { href: "/dashboard/myBooking", icon: Icons.Booking, label: "My Bookings" },
+      { href: "/dashboard/payment", icon: Icons.Payment, label: "Payments" },
+    ];
+
+    const roleSpecificItems = {
+      admin: [
+        { href: "/dashboard/manage-decorators", icon: Icons.Worker, label: "Decorator Management" },
+        { href: "/dashboard/assign-task", icon: Icons.Task, label: "Assign Tasks" },
+        { href: "/dashboard/worker-dashboard", icon: Icons.Worker, label: "Worker Dashboard" },
+      ],
+      user: [
+        { href: "/dashboard/becomeworker", icon: Icons.Worker, label: "Apply as Worker" },
+      ],
+      worker: [
+        { href: "/dashboard/my-tasks", icon: Icons.Task, label: "My Tasks" },
+        { href: "/dashboard/earnings", icon: Icons.Payment, label: "Earnings" },
+      ],
+    };
+
+    let role = session?.role;
+    let items = [...commonItems];
+    
+    if (role === 'admin') items.push(...roleSpecificItems.admin);
+    else if (role === 'user') items.push(...roleSpecificItems.user);
+    else if (role === 'worker') items.push(...roleSpecificItems.worker);
+    
+    return items;
+  };
+
+  const navItems = getNavItems();
+
+  if (status === "loading") {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="loading loading-spinner loading-lg"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="drawer lg:drawer-open">
       <input id="my-drawer-4" type="checkbox" className="drawer-toggle" />
-      <div className="drawer-content">
-        {/* Navbar */}
-        <nav className="navbar w-full bg-base-300">
-          <label htmlFor="my-drawer-4" aria-label="open sidebar" className="btn btn-square btn-ghost">
-            {/* Sidebar toggle icon */}
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" strokeLinejoin="round" strokeLinecap="round" strokeWidth="2" fill="none" stroke="currentColor" className="my-1.5 inline-block size-4"><path d="M4 4m0 2a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v12a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2z"></path><path d="M9 4v16"></path><path d="M14 10l2 2l-2 2"></path></svg>
-          </label>
-          <div>
-            <Logo></Logo>
+      
+      <div className="drawer-content flex flex-col">
+        {/* Enhanced Navbar */}
+        <nav className="navbar sticky top-0 z-30 bg-base-100 shadow-md">
+          <div className="flex-none lg:hidden">
+            <label htmlFor="my-drawer-4" aria-label="open sidebar" className="btn btn-square btn-ghost">
+              <Icons.Menu />
+            </label>
+          </div>
+          
+          <div className="flex-1">
+            <Logo />
+          </div>
+          
+          <div className="flex-none gap-2">
+            {/* User Info */}
+            {session?.user && (
+              <div className="dropdown dropdown-end">
+                <label tabIndex={0} className="btn btn-ghost btn-circle avatar placeholder">
+                  <div className="bg-neutral text-neutral-content rounded-full w-10">
+                    <span className="text-sm">
+                      {session.user.name?.charAt(0) || session.user.email?.charAt(0)}
+                    </span>
+                  </div>
+                </label>
+                <ul tabIndex={0} className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52">
+                  <li className="menu-title">
+                    <span>{session.user.email}</span>
+                  </li>
+                  <li><Link href="/dashboard/profile">Profile</Link></li>
+                  <li><Link href="/dashboard/settings">Settings</Link></li>
+                  <li><div className="text-error"><AuthLogin /></div></li>
+                </ul>
+              </div>
+            )}
           </div>
         </nav>
-        {/* Page content here */}
 
-
-        <main className='p-3'>
-          {children}
+        {/* Main Content */}
+        <main className="flex-1 p-4 md:p-6 bg-base-200 min-h-[calc(100vh-4rem)]">
+          <div className="animate-fadeIn">
+            {children}
+          </div>
         </main>
-
-
       </div>
 
-      <div className="drawer-side is-drawer-close:overflow-visible">
+      {/* Enhanced Sidebar */}
+      <div className="drawer-side">
         <label htmlFor="my-drawer-4" aria-label="close sidebar" className="drawer-overlay"></label>
-        <div className="flex min-h-full flex-col items-start bg-base-200 is-drawer-close:w-14 is-drawer-open:w-64">
-          {/* Sidebar content here */}
-          {
-            session?.role ===
-              'admin'
-              ?
-              <ul className="menu w-full grow">
-                {/* List item */}
-                <li>
-                  <Link href="/" className="is-drawer-close:tooltip is-drawer-close:tooltip-right" data-tip="Homepage">
-                    {/* Home icon */}
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" strokeLinejoin="round" strokeLinecap="round" strokeWidth="2" fill="none" stroke="currentColor" className="my-1.5 inline-block size-4"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
-                    <span className="is-drawer-close:hidden">Homepage</span>
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/dashboard/profile" className="is-drawer-close:tooltip is-drawer-close:tooltip-right" data-tip="Profile">
-                    {/* Profile icon */}
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      strokeWidth="2"
-                      stroke="currentColor"
-                      fill="none"
-                      className="w-5 h-5"
-                    >
-                      <path d="M20 7h-9"></path>
-                      <path d="M14 17H5"></path>
-                      <circle cx="17" cy="17" r="3"></circle>
-                      <circle cx="7" cy="7" r="3"></circle>
-                    </svg>
-                    <span className="is-drawer-close:hidden">Profile</span>
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/dashboard/myBooking" className="is-drawer-close:tooltip is-drawer-close:tooltip-right" data-tip="My Booking">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      strokeWidth="2"
-                      stroke="currentColor"
-                      fill="none"
-                      className="w-5 h-5"
-                    >
-                      <path d="M20 7h-9"></path>
-                      <path d="M14 17H5"></path>
-                      <circle cx="17" cy="17" r="3"></circle>
-                      <circle cx="7" cy="7" r="3"></circle>
-                    </svg>
-                    <span className="is-drawer-close:hidden">Decorator manage </span>
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/dashboard/payment" className="is-drawer-close:tooltip is-drawer-close:tooltip-right" data-tip="Payment">
+        
+        <div className={`flex flex-col h-full bg-base-100 shadow-xl transition-all duration-300 ${
+          isCollapsed ? 'w-20' : 'w-64'
+        }`}>
+          {/* Sidebar Header with Collapse Toggle */}
+          <div className="flex items-center justify-between p-4 border-b border-base-300">
+            {!isCollapsed && (
+              <div className="font-bold text-xl">
+                <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                  Menu
+                </span>
+              </div>
+            )}
+            <button
+              onClick={() => setIsCollapsed(!isCollapsed)}
+              className="btn btn-sm btn-ghost btn-circle"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                className={`w-4 h-4 transition-transform duration-300 ${
+                  isCollapsed ? 'rotate-180' : ''
+                }`}
+              >
+                <polyline points="15 18 9 12 15 6" />
+              </svg>
+            </button>
+          </div>
 
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      strokeWidth="2"
-                      stroke="currentColor"
-                      fill="none"
-                      className="w-5 h-5"
-                    >
-                      <path d="M20 7h-9"></path>
-                      <path d="M14 17H5"></path>
-                      <circle cx="17" cy="17" r="3"></circle>
-                      <circle cx="7" cy="7" r="3"></circle>
-                    </svg>
-                    <span className="is-drawer-close:hidden">Payment</span>
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/dashboard/payment" className="is-drawer-close:tooltip is-drawer-close:tooltip-right" data-tip="Payment">
+          {/* Navigation Items */}
+          <div className="flex-1 overflow-y-auto py-4">
+            <SidebarSection items={navItems} isCollapsed={isCollapsed} />
+          </div>
 
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      strokeWidth="2"
-                      stroke="currentColor"
-                      fill="none"
-                      className="w-5 h-5"
-                    >
-                      <path d="M20 7h-9"></path>
-                      <path d="M14 17H5"></path>
-                      <circle cx="17" cy="17" r="3"></circle>
-                      <circle cx="7" cy="7" r="3"></circle>
-                    </svg>
-                    <span className="is-drawer-close:hidden">Assign Task</span>
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/dashboard/payment" className="is-drawer-close:tooltip is-drawer-close:tooltip-right" data-tip="Apply for Woker">
-
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      strokeWidth="2"
-                      stroke="currentColor"
-                      fill="none"
-                      className="w-5 h-5"
-                    >
-                      <path d="M20 7h-9"></path>
-                      <path d="M14 17H5"></path>
-                      <circle cx="17" cy="17" r="3"></circle>
-                      <circle cx="7" cy="7" r="3"></circle>
-                    </svg>
-                    <span className="is-drawer-close:hidden">Worker Dashboard</span>
-                  </Link>
-                </li>
-                <li>
-                  <div className="is-drawer-close:tooltip is-drawer-close:tooltip-right" data-tip="Logout">
-                    {/* Settings icon */}
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 24 24"
-                      strokeWidth="2"
-                      stroke="currentColor"
-                      fill="none"
-                      className="w-5 h-5"
-                    >
-                      <path d="M20 7h-9"></path>
-                      <path d="M14 17H5"></path>
-                      <circle cx="17" cy="17" r="3"></circle>
-                      <circle cx="7" cy="7" r="3"></circle>
-                    </svg>
-                    <span className="is-drawer-close:hidden"><AuthLogin></AuthLogin></span>
-                  </div>
-                </li>
-              </ul>
-              : session?.role === "user" ?
-                <ul className="menu w-full grow">
-                  {/* List item */}
-                  <li>
-                    <Link href="/" className="is-drawer-close:tooltip is-drawer-close:tooltip-right" data-tip="Homepage">
-                      {/* Home icon */}
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" strokeLinejoin="round" strokeLinecap="round" strokeWidth="2" fill="none" stroke="currentColor" className="my-1.5 inline-block size-4"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
-                      <span className="is-drawer-close:hidden">Homepage</span>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/dashboard/profile" className="is-drawer-close:tooltip is-drawer-close:tooltip-right" data-tip="Profile">
-                      {/* Profile icon */}
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        strokeWidth="2"
-                        stroke="currentColor"
-                        fill="none"
-                        className="w-5 h-5"
-                      >
-                        <path d="M20 7h-9"></path>
-                        <path d="M14 17H5"></path>
-                        <circle cx="17" cy="17" r="3"></circle>
-                        <circle cx="7" cy="7" r="3"></circle>
-                      </svg>
-                      <span className="is-drawer-close:hidden">Profile</span>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/dashboard/myBooking" className="is-drawer-close:tooltip is-drawer-close:tooltip-right" data-tip="My Booking">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        strokeWidth="2"
-                        stroke="currentColor"
-                        fill="none"
-                        className="w-5 h-5"
-                      >
-                        <path d="M20 7h-9"></path>
-                        <path d="M14 17H5"></path>
-                        <circle cx="17" cy="17" r="3"></circle>
-                        <circle cx="7" cy="7" r="3"></circle>
-                      </svg>
-                      <span className="is-drawer-close:hidden">My Booking</span>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/dashboard/payment" className="is-drawer-close:tooltip is-drawer-close:tooltip-right" data-tip="Payment">
-
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        strokeWidth="2"
-                        stroke="currentColor"
-                        fill="none"
-                        className="w-5 h-5"
-                      >
-                        <path d="M20 7h-9"></path>
-                        <path d="M14 17H5"></path>
-                        <circle cx="17" cy="17" r="3"></circle>
-                        <circle cx="7" cy="7" r="3"></circle>
-                      </svg>
-                      <span className="is-drawer-close:hidden">Payment</span>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/dashboard/becomeworker" className="is-drawer-close:tooltip is-drawer-close:tooltip-right" data-tip="Apply for Woker">
-
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        strokeWidth="2"
-                        stroke="currentColor"
-                        fill="none"
-                        className="w-5 h-5"
-                      >
-                        <path d="M20 7h-9"></path>
-                        <path d="M14 17H5"></path>
-                        <circle cx="17" cy="17" r="3"></circle>
-                        <circle cx="7" cy="7" r="3"></circle>
-                      </svg>
-                      <span className="is-drawer-close:hidden">Apply For Worker</span>
-                    </Link>
-                  </li>
-                  <li>
-                    <div className="is-drawer-close:tooltip is-drawer-close:tooltip-right" data-tip="Logout">
-                      {/* Settings icon */}
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        strokeWidth="2"
-                        stroke="currentColor"
-                        fill="none"
-                        className="w-5 h-5"
-                      >
-                        <path d="M20 7h-9"></path>
-                        <path d="M14 17H5"></path>
-                        <circle cx="17" cy="17" r="3"></circle>
-                        <circle cx="7" cy="7" r="3"></circle>
-                      </svg>
-                      <span className="is-drawer-close:hidden"><AuthLogin></AuthLogin></span>
-                    </div>
-                  </li>
-                </ul>
-                :
-                <ul className="menu w-full grow">
-                  {/* List item */}
-                  <li>
-                    <Link href="/" className="is-drawer-close:tooltip is-drawer-close:tooltip-right" data-tip="Homepage">
-                      {/* Home icon */}
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" strokeLinejoin="round" strokeLinecap="round" strokeWidth="2" fill="none" stroke="currentColor" className="my-1.5 inline-block size-4"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path><path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg>
-                      <span className="is-drawer-close:hidden">Homepage</span>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/dashboard/profile" className="is-drawer-close:tooltip is-drawer-close:tooltip-right" data-tip="Profile">
-                      {/* Profile icon */}
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        strokeWidth="2"
-                        stroke="currentColor"
-                        fill="none"
-                        className="w-5 h-5"
-                      >
-                        <path d="M20 7h-9"></path>
-                        <path d="M14 17H5"></path>
-                        <circle cx="17" cy="17" r="3"></circle>
-                        <circle cx="7" cy="7" r="3"></circle>
-                      </svg>
-                      <span className="is-drawer-close:hidden">Profile</span>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/dashboard/myBooking" className="is-drawer-close:tooltip is-drawer-close:tooltip-right" data-tip="My Booking">
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        strokeWidth="2"
-                        stroke="currentColor"
-                        fill="none"
-                        className="w-5 h-5"
-                      >
-                        <path d="M20 7h-9"></path>
-                        <path d="M14 17H5"></path>
-                        <circle cx="17" cy="17" r="3"></circle>
-                        <circle cx="7" cy="7" r="3"></circle>
-                      </svg>
-                      <span className="is-drawer-close:hidden">Task</span>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/dashboard/payment" className="is-drawer-close:tooltip is-drawer-close:tooltip-right" data-tip="Payment">
-
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        strokeWidth="2"
-                        stroke="currentColor"
-                        fill="none"
-                        className="w-5 h-5"
-                      >
-                        <path d="M20 7h-9"></path>
-                        <path d="M14 17H5"></path>
-                        <circle cx="17" cy="17" r="3"></circle>
-                        <circle cx="7" cy="7" r="3"></circle>
-                      </svg>
-                      <span className="is-drawer-close:hidden">Payment</span>
-                    </Link>
-                  </li>
-                  <li>
-                    <Link href="/dashboard/payment" className="is-drawer-close:tooltip is-drawer-close:tooltip-right" data-tip="Apply for Woker">
-
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        strokeWidth="2"
-                        stroke="currentColor"
-                        fill="none"
-                        className="w-5 h-5"
-                      >
-                        <path d="M20 7h-9"></path>
-                        <path d="M14 17H5"></path>
-                        <circle cx="17" cy="17" r="3"></circle>
-                        <circle cx="7" cy="7" r="3"></circle>
-                      </svg>
-                      <span className="is-drawer-close:hidden">Worker Dashboard</span>
-                    </Link>
-                  </li>
-                  <li>
-                    <div className="is-drawer-close:tooltip is-drawer-close:tooltip-right" data-tip="Logout">
-                      {/* Settings icon */}
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        strokeWidth="2"
-                        stroke="currentColor"
-                        fill="none"
-                        className="w-5 h-5"
-                      >
-                        <path d="M20 7h-9"></path>
-                        <path d="M14 17H5"></path>
-                        <circle cx="17" cy="17" r="3"></circle>
-                        <circle cx="7" cy="7" r="3"></circle>
-                      </svg>
-                      <span className="is-drawer-close:hidden"><AuthLogin></AuthLogin></span>
-                    </div>
-                  </li>
-                </ul>
-          }
+          {/* Footer with Logout */}
+          <div className="p-4 border-t border-base-300">
+            <div 
+              className={`group relative flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-error/10 hover:text-error cursor-pointer ${
+                isCollapsed ? 'justify-center' : ''
+              }`}
+              data-tip={isCollapsed ? "Logout" : undefined}
+            >
+              <Icons.Logout />
+              {!isCollapsed && (
+                <span className="text-error">
+                  <AuthLogin />
+                </span>
+              )}
+            </div>
+          </div>
         </div>
       </div>
+
+      <style jsx>{`
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(10px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        
+        .animate-fadeIn {
+          animation: fadeIn 0.3s ease-out;
+        }
+      `}</style>
     </div>
   );
 };

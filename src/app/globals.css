@@ -130,3 +130,41 @@ body {
 }
 
 
+/* Add to your existing global CSS */
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-slideDown {
+    animation: slideDown 0.2s ease-out;
+}
+
+/* Enhanced NavLink styling (optional - add to your NavLink component) */
+.navbar .menu li a {
+    @apply relative font-medium transition-all duration-300;
+}
+
+.navbar .menu li a::after {
+    content: '';
+    @apply absolute bottom-0 left-1/2 w-0 h-0.5 bg-gradient-to-r from-primary to-secondary transition-all duration-300;
+    transform: translateX(-50%);
+}
+
+.navbar .menu li a:hover::after {
+    @apply w-full;
+}
+
+.navbar .menu li a.active {
+    @apply text-primary font-semibold;
+}
+
+.navbar .menu li a.active::after {
+    @apply w-full;
+}
