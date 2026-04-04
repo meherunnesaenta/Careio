@@ -6,6 +6,11 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import React, { useState } from 'react';
 
+const normalizeCallbackUrl = (url) => {
+  if (!url) return '/';
+  return url.replace(/^https?:\/\/[^/]+/, '') || '/';
+};
+
 const RegisterForm = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -13,7 +18,7 @@ const RegisterForm = () => {
   const [error, setError] = useState('');
   const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get('callbackUrl') || '/';
+  const callbackUrl = normalizeCallbackUrl(searchParams.get('callbackUrl') || '/');
 
   const handleRegister = async (e) => {
   e.preventDefault();

@@ -2,11 +2,12 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useSession, signOut } from 'next-auth/react';
-import Loading from '@/app/loading';
 
 const AuthLogin = () => {
   const { data: session, status } = useSession();
+  const pathname = usePathname();
 
   if (status === 'loading') {
     return <div className="w-10">
@@ -19,7 +20,7 @@ const AuthLogin = () => {
       {session ? (
         <button
           className='btn btn-secondary'
-          onClick={() => signOut()}
+          onClick={() => signOut({ callbackUrl: `/login?callbackUrl=${pathname}` })}
         >
           Log Out
         </button>

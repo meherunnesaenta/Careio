@@ -4,6 +4,7 @@ import Link from 'next/link';
 import Logo from '../components/layout/Logo';
 import { useSession } from 'next-auth/react';
 import AuthLogin from '../components/Button/AuthLogin';
+import { redirect, usePathname } from 'next/navigation';
 
 // Icon components for better organization
 const Icons = {
@@ -77,11 +78,10 @@ const Icons = {
 // Sidebar Item Component
 const SidebarItem = ({ href, icon: Icon, label, isCollapsed }) => (
   <li>
-    <Link 
-      href={href} 
-      className={`group relative flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-base-300 ${
-        isCollapsed ? 'justify-center' : ''
-      }`}
+    <Link
+      href={href}
+      className={`group relative flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-base-300 ${isCollapsed ? 'justify-center' : ''
+        }`}
       data-tip={isCollapsed ? label : undefined}
     >
       <Icon />
@@ -102,6 +102,19 @@ const SidebarSection = ({ items, isCollapsed }) => (
 const DashBoardLayout = ({ children }) => {
   const { data: session, status } = useSession();
   const [isCollapsed, setIsCollapsed] = React.useState(false);
+  const pathname = usePathname();
+
+  if (status === 'loading') {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="loading loading-spinner loading-lg"></div>
+      </div>
+    );
+  }
+
+  if (!session) {
+    redirect(`/login?callbackUrl=${pathname}`);
+  }
 
   // Navigation items based on user role
   const getNavItems = () => {
@@ -129,11 +142,11 @@ const DashBoardLayout = ({ children }) => {
 
     let role = session?.role;
     let items = [...commonItems];
-    
+
     if (role === 'admin') items.push(...roleSpecificItems.admin);
     else if (role === 'user') items.push(...roleSpecificItems.user);
     else if (role === 'worker') items.push(...roleSpecificItems.worker);
-    
+
     return items;
   };
 
@@ -150,7 +163,7 @@ const DashBoardLayout = ({ children }) => {
   return (
     <div className="drawer lg:drawer-open">
       <input id="my-drawer-4" type="checkbox" className="drawer-toggle" />
-      
+
       <div className="drawer-content flex flex-col">
         {/* Enhanced Navbar */}
         <nav className="navbar sticky top-0 z-30 bg-base-100 shadow-md">
@@ -159,11 +172,11 @@ const DashBoardLayout = ({ children }) => {
               <Icons.Menu />
             </label>
           </div>
-          
+
           <div className="flex-1">
             <Logo />
           </div>
-          
+
 
         </nav>
 
@@ -178,10 +191,9 @@ const DashBoardLayout = ({ children }) => {
       {/* Enhanced Sidebar */}
       <div className="drawer-side">
         <label htmlFor="my-drawer-4" aria-label="close sidebar" className="drawer-overlay"></label>
-        
-        <div className={`flex flex-col h-full bg-base-100 shadow-xl transition-all duration-300 ${
-          isCollapsed ? 'w-20' : 'w-64'
-        }`}>
+
+        <div className={`flex flex-col h-full bg-base-100 shadow-xl transition-all duration-300 ${isCollapsed ? 'w-20' : 'w-64'
+          }`}>
           {/* Sidebar Header with Collapse Toggle */}
           <div className="flex items-center justify-between p-4 border-b border-base-300">
             {!isCollapsed && (
@@ -201,9 +213,8 @@ const DashBoardLayout = ({ children }) => {
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2"
-                className={`w-4 h-4 transition-transform duration-300 ${
-                  isCollapsed ? 'rotate-180' : ''
-                }`}
+                className={`w-4 h-4 transition-transform duration-300 ${isCollapsed ? 'rotate-180' : ''
+                  }`}
               >
                 <polyline points="15 18 9 12 15 6" />
               </svg>
@@ -217,17 +228,15 @@ const DashBoardLayout = ({ children }) => {
 
           {/* Footer with Logout */}
           <div className="p-4 border-t border-base-300">
-            <div 
-              className={`group relative flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-error/10 hover:text-error cursor-pointer ${
-                isCollapsed ? 'justify-center' : ''
-              }`}
+            <div
+              className={`group relative flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-error/10 hover:text-error cursor-pointer ${isCollapsed ? 'justify-center' : ''
+                }`}
               data-tip={isCollapsed ? "Logout" : undefined}
             >
               <Icons.Logout />
               {!isCollapsed && (
-                <span className="text-error">
+                
                   <AuthLogin />
-                </span>
               )}
             </div>
           </div>

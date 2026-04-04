@@ -1,15 +1,37 @@
 'use client'
 
+import React, { useState, useEffect } from 'react';
 import { signIn } from 'next-auth/react';
 import { useSearchParams } from 'next/navigation';
-import React from 'react';
+
+const normalizeCallbackUrl = (url) => {
+  if (!url) return '/';
+  return url.replace(/^https?:\/\/[^/]+/, '') || '/';
+};
 
 const SocialLogin = () => {
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get('callbackUrl') || '/';
+  const initialCallbackUrl = normalizeCallbackUrl(searchParams.get('callbackUrl') || '/');
+  const [callbackUrl, setCallbackUrl] = useState(initialCallbackUrl);
+
+  useEffect(() => {
+    const urlFromParams = searchParams.get('callbackUrl');
+    const urlFromStorage = typeof window !== 'undefined' ? localStorage.getItem('callbackUrl') : null;
+    const rawUrl = urlFromParams || urlFromStorage || '/';
+
+    setCallbackUrl(normalizeCallbackUrl(rawUrl));
+  }, [searchParams]);
 
   const handleGoogleLogin = async () => {
-    await signIn("google", { callbackUrl });
+    const absoluteCallbackUrl = callbackUrl.startsWith('http')
+      ? callbackUrl
+      : `${window.location.origin}${callbackUrl}`;
+
+    await signIn("google", { callbackUrl: absoluteCallbackUrl });
+    // Clear the saved callback URL after successful login
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('callbackUrl');
+    }
   };
 
   return (

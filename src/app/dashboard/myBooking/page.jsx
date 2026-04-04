@@ -9,7 +9,7 @@ const MyBooking = async () => {
   const session = await getServerSession();
 
   if (!session) {
-    redirect(`/login?callbackUrl=/my-booking`);
+    redirect(`/login?callbackUrl=/dashboard/myBooking`);
   }
 
   const bookings = await getBooking();

@@ -1,24 +1,43 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import SocialLogin from '../Button/SocialLogin';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { signIn } from 'next-auth/react';
+
+const normalizeCallbackUrl = (url) => {
+  if (!url) return '/';
+  return url.replace(/^https?:\/\/[^/]+/, '') || '/';
+};
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const router = useRouter();
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get('callbackUrl') || '/';
+  const initialCallbackUrl = normalizeCallbackUrl(searchParams.get('callbackUrl') || '/');
+  const [callbackUrl, setCallbackUrl] = useState(initialCallbackUrl);
+
+  useEffect(() => {
+    const urlFromParams = searchParams.get('callbackUrl');
+    const urlFromStorage = typeof window !== 'undefined' ? localStorage.getItem('callbackUrl') : null;
+    const rawUrl = urlFromStorage || urlFromParams || '/';
+
+    setCallbackUrl(normalizeCallbackUrl(rawUrl));
+  }, [searchParams]);
+
   const handleLogin = async (e) => {
     e.preventDefault();
+
+    const absoluteCallbackUrl = callbackUrl.startsWith('http')
+      ? callbackUrl
+      : `${window.location.origin}${callbackUrl}`;
 
     const result = await signIn('credentials', {
       email,
       password,
+      callbackUrl: absoluteCallbackUrl,
       redirect: false
     });
     if (result?.error) {
@@ -29,7 +48,13 @@ const LoginForm = () => {
       )
       return
     }
-    router.push(callbackUrl)
+    // Clear saved callback URL after successful login
+    localStorage.removeItem('callbackUrl');
+    if (result?.url) {
+      window.location.href = result.url;
+    } else {
+      window.location.href = absoluteCallbackUrl;
+    }
 
 
   };

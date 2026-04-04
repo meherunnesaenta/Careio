@@ -6,6 +6,7 @@ const UserDashboard = async () => {
   const session = await getServerSession();
   const bookings = (await getBookingByEmail(session?.user?.email))?.bookings || [];
 
+
   return <DashboardCharts bookings={bookings} session={session} />;
 };
 
