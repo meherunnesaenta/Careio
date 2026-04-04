@@ -12,7 +12,22 @@ const ServiceCard = ({ service }) => {
     shortDescription,
     price,
     features,
+    description,
   } = service;
+
+  const descriptionText = shortDescription 
+
+  const parsedFeatures = Array.isArray(features)
+    ? features.filter(Boolean).map((item) => String(item).trim())
+    : typeof features === 'string'
+    ? features
+        .split('. ')
+        .map((item) => item.trim().replace(/\.$/, ''))
+        .filter(Boolean)
+    : [];
+
+  const visibleFeatures = parsedFeatures.slice(0, 2);
+  const extraCount = Math.max(parsedFeatures.length - visibleFeatures.length, 0);
 
   return (
     <div className="card bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-1 overflow-hidden group">
@@ -52,22 +67,26 @@ const ServiceCard = ({ service }) => {
         </h2>
         
         {/* Description */}
-        <p className="text-base-content/70 text-sm line-clamp-2 mb-2">
-          {shortDescription}
+        <p className="text-base-content/70 text-sm line-clamp-2 mb-2 overflow-hidden">
+          {descriptionText}
         </p>
         
         {/* Features */}
-        <div className="space-y-1.5 mt-2">
-          {features?.slice(0, 2).map((feature, index) => (
-            <div key={index} className="flex items-center gap-2 text-sm text-base-content/80">
-              <FaCheckCircle className="text-success w-4 h-4 flex-shrink-0" />
-              <span className="line-clamp-1">{feature}</span>
-            </div>
+        <div className="flex flex-wrap gap-2 mt-3">
+          {visibleFeatures.map((feature, index) => (
+            <span
+              key={index}
+              className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-medium text-primary shadow-sm"
+              title={feature}
+            >
+              <FaCheckCircle className="h-3.5 w-3.5 text-primary" />
+              <span className="max-w-[10rem] truncate">{feature}</span>
+            </span>
           ))}
-          {features?.length > 2 && (
-            <div className="text-sm text-primary font-medium mt-1">
-              +{features.length } more features
-            </div>
+          {extraCount > 0 && (
+            <span className="inline-flex items-center rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-medium text-primary shadow-sm">
+              +{extraCount} more
+            </span>
           )}
         </div>
         

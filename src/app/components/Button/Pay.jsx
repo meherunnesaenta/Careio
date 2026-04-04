@@ -1,31 +1,42 @@
 'use client';
-import { createCheckoutSession } from '@/app/api/create-checkout-session/route';
 import React, { useState } from 'react';
 
-const Pay = ({ booking }) => {
+const Pay = ({ booking, paid }) => {
     const [loading, setLoading] = useState(false);
 
     const handlePayment = async () => {
         setLoading(true);
 
-        const result = await createCheckoutSession(booking);
+        try {
+            const res = await fetch('/api/create-checkout-session', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(booking)
+            });
 
-        if (result.success && result.url) {
-            window.location.href = result.url;
-        } else {
-            alert(result.message || 'Payment start korte problem hoyeche');
+            const result = await res.json();
+
+            if (result.success && result.url) {
+                window.location.href = result.url;
+            } else {
+                alert(result.message);
+            }
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setLoading(false);
         }
-
-        setLoading(false);
     };
 
     return (
         <button 
             onClick={handlePayment} 
-            disabled={loading}
+            disabled={loading || paid}
             className="btn btn-outline btn-secondary"
         >
-            {loading ? 'Processing...' : 'Pay Now'}
+            {loading ? 'Processing...' : paid ? 'Paid' : 'Pay Now'}
         </button>
     );
 };

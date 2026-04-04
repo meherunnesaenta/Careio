@@ -1,13 +1,28 @@
 'use client';
-
 import { updateBooking } from '@/actions/server/booking';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import RemoveCard from '../Button/RemoveCard';
 import Pay from '../Button/Pay';
+import { getPayStatus } from '@/actions/server/payment';
 
 const BookingCard = ({ booking }) => {
+
   const [quantity, setQuantity] = useState(booking.quantity || 1);
   const [total, setTotal] = useState(booking.totalAmount || 0);
+  const [paid, setPaid] = useState(false);
+
+  // ✅ payment status check (correct way)
+  useEffect(() => {
+    const checkStatus = async () => {
+      const res = await getPayStatus(booking.serviceId);
+
+      if (res?.status === 'paid') {
+        setPaid(true);
+      }
+    };
+
+    checkStatus();
+  }, [booking.serviceId]);
 
   const handleInc = async () => {
     const res = await updateBooking(booking, true);
@@ -32,14 +47,12 @@ const BookingCard = ({ booking }) => {
   return (
     <div className="card bg-base-200 shadow-xl p-4 flex flex-col md:flex-row gap-9">
 
-      {/* Image */}
       <img
         src={booking.image}
         alt="service"
         className="w-full md:w-40 h-32 object-cover rounded-xl"
       />
 
-      {/* Content */}
       <div className="flex-1">
         <h2 className="text-xl font-bold capitalize">
           {booking.category || 'Service'}
@@ -48,26 +61,15 @@ const BookingCard = ({ booking }) => {
         <p className="text-sm opacity-70 mt-1">
           Status:
           <span className="ml-2 badge badge-warning">
-            {booking.status || 'pending'}
+            {paid ? 'paid' : 'pending'}
           </span>
         </p>
 
-        {/* Quantity Controller */}
         <div className="flex items-center gap-3 mt-4">
-
-          <button onClick={handleDec} className="btn btn-sm btn-error">
-            -
-          </button>
-
+          <button onClick={handleDec} className="btn btn-sm btn-error">-</button>
           <span className="text-lg font-semibold">{quantity}</span>
-
-          <button onClick={handleInc} className="btn btn-sm btn-success">
-            +
-          </button>
+          <button onClick={handleInc} className="btn btn-sm btn-success">+</button>
         </div>
-
-        {/* Price */}
-
       </div>
 
       <div className="mt-3 flex-1">
@@ -79,9 +81,8 @@ const BookingCard = ({ booking }) => {
         </p>
       </div>
 
-      {/* Action */}
       <div className="flex md:flex-col justify-between items-end gap-2">
-        <Pay booking={booking}></Pay>
+        <Pay booking={booking} paid={paid} />
         <RemoveCard booking={booking} />
       </div>
     </div>

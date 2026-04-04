@@ -19,7 +19,7 @@ export const createPayment = async (payload) => {
       userId,
       amount: Number(totalAmount),
       paymentMethod,
-      status: 'pending',
+      status: 'paid',
       createdAt: new Date(),
       // stripeSessionId: null,   // pore webhook e add korbo
     };
@@ -54,6 +54,35 @@ export const getPaymentByEmail = async (userId) => {
     return {
       acknowledged: true,
       payments
+    };
+  } catch (error) {
+    console.error(error);
+    return {
+      acknowledged: false,
+      message: error.message || "Database error"
+    };
+  }
+};
+
+
+export const  getPayStatus =async (serviceId) => {
+  try {
+    if (!serviceId) {
+      return {
+        acknowledged: false,
+        message: 'Service ID is required'
+      };
+    }
+    const payment = await paymentCollection.findOne({ serviceId });
+    if (!payment) {
+      return {
+        acknowledged: false,
+        message: 'Payment not found'
+      };
+    }
+    return {
+      acknowledged: true,
+      status: payment.status
     };
   } catch (error) {
     console.error(error);

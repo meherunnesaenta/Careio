@@ -17,16 +17,16 @@ const MyBooking = async () => {
   return (
     <div className="container-custom py-10">
 
-        <Heading>My Bookings</Heading>
+      <Heading>My Bookings</Heading>
 
       {bookings.length === 0 ? (
         <div className="text-center py-20">
-          <p className="text-lg opacity-70">No bookings found 😢</p>
+          <p className="text-lg opacity-70">No bookings found </p>
         </div>
       ) : (
         <div className="grid gap-6">
           {bookings.map((booking) => (
-            <BookingCard key={booking._id} booking={booking} />
+            <BookingCard key={booking._id} booking={booking}  />
           ))}
         </div>
       )}
