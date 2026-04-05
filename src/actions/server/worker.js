@@ -2,13 +2,23 @@
 
 import { connect } from "@/lib/dbconnect";
 
-
-    const workerCollection = await connect('workers');
-
+// Collection initialization - only once
+const workerCollection = await connect('workers');
 
 export const postworker = async (payload) => {
   try {
-    const { fullName, location, serviceType, organization, experience, bio, phone, email, cvFileName } = payload;
+    const { 
+      fullName, 
+      location, 
+      serviceType, 
+      organization, 
+      experience, 
+      bio, 
+      phone, 
+      email, 
+      cvFileName,
+      image  // ADD image field
+    } = payload;
 
     if (!fullName || !location || !serviceType || !email) {
       return { 
@@ -19,7 +29,6 @@ export const postworker = async (payload) => {
 
     console.log("postworker Payload:", payload);
 
-
     const newworker = {
       userName: fullName.trim(),
       userEmail: email.toLowerCase().trim(),
@@ -29,7 +38,8 @@ export const postworker = async (payload) => {
       experience: experience ? parseInt(experience) : 0,
       bio: bio?.trim() || "",
       phone: phone?.trim() || "",
-      cvFileName: cvFileName || null,        
+      cvFileName: cvFileName || null,
+      image: image || null,  // ADD image to database
       role: "worker",                     
       rating: 0,
       totalReviews: 0,
@@ -55,32 +65,138 @@ export const postworker = async (payload) => {
   }
 };
 
-// Optional: Get all workers
+// Get all workers - FIXED version with image
 export const getworkers = async () => {
   try {
-    const db = await connect();
-    const workerCollection = db.collection('workers');
-    
     const result = await workerCollection.find({}).toArray();
+    
     return result.map(doc => ({
       ...doc,
-      _id: doc._id.toString()
+      _id: doc._id.toString(),
+      name: doc.userName,
+      email: doc.userEmail,
+      image: doc.image || null, // Include image field
     }));
   } catch (error) {
     console.error("getworkers Error:", error);
-    throw new Error("Failed to fetch workers");
+    return [];
   }
 };
 
+// Get worker by email
+export const getWorkerByEmail = async (email) => {
+  try {
+    if (!email) return null;
+    
+    const worker = await workerCollection.findOne({ 
+      userEmail: email.toLowerCase().trim() 
+    });
+    
+    if (worker) {
+      return {
+        ...worker,
+        _id: worker._id.toString(),
+        image: worker.image || null,
+      };
+    }
+    return null;
+  } catch (error) {
+    console.error("getWorkerByEmail Error:", error);
+    return null;
+  }
+};
+
+// Check if existing worker
 export const isExistingWorker = async (email) => {
   try {
-    if (!email) return false;  
-    const existing = await workerCollection.findOne({ userEmail: email.toLowerCase().trim() });
+    if (!email) return false;
+    
+    const existing = await workerCollection.findOne({ 
+      userEmail: email.toLowerCase().trim() 
+    });
+    
     return Boolean(existing);
-  }
-  catch (error) {
+  } catch (error) {
     console.error("isExistingWorker Error:", error);
     return false;
   }
 };
 
+// Get workers by service type
+export const getWorkersByService = async (serviceType) => {
+  try {
+    if (!serviceType) return [];
+    
+    const result = await workerCollection.find({ 
+      serviceType: serviceType,
+      status: "approved"
+    }).toArray();
+    
+    return result.map(doc => ({
+      ...doc,
+      _id: doc._id.toString(),
+      name: doc.userName,
+      email: doc.userEmail,
+      image: doc.image || null,
+    }));
+  } catch (error) {
+    console.error("getWorkersByService Error:", error);
+    return [];
+  }
+};
+
+// Update worker status (approve/reject)
+export const updateWorkerStatus = async (workerId, status) => {
+  try {
+    const { ObjectId } = require('mongodb');
+    
+    const result = await workerCollection.updateOne(
+      { _id: new ObjectId(workerId) },
+      { 
+        $set: { 
+          status: status,
+          updatedAt: new Date()
+        } 
+      }
+    );
+    
+    return {
+      success: result.modifiedCount > 0,
+      message: result.modifiedCount > 0 ? `Worker ${status} successfully` : "Worker not found"
+    };
+  } catch (error) {
+    console.error("updateWorkerStatus Error:", error);
+    return {
+      success: false,
+      message: error.message
+    };
+  }
+};
+
+// Update worker image
+export const updateWorkerImage = async (workerId, imageUrl) => {
+  try {
+    const { ObjectId } = require('mongodb');
+    
+    const result = await workerCollection.updateOne(
+      { _id: new ObjectId(workerId) },
+      { 
+        $set: { 
+          image: imageUrl,
+          updatedAt: new Date()
+        } 
+      }
+    );
+    
+    return {
+      success: result.modifiedCount > 0,
+      message: result.modifiedCount > 0 ? "Image updated successfully" : "Worker not found"
+    };
+  } catch (error) {
+    console.error("updateWorkerImage Error:", error);
+    return {
+      success: false,
+      message: error.message
+    };
+  }
+};

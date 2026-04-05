@@ -21,8 +21,17 @@ export default function Home() {
 
       <div className="grid grid-cols-1 gap-15 ">
         <Banner></Banner>
-        <Heading>Our Best Service</Heading>
-        <Service></Service>
+        <div>
+          <Heading
+            center={true}
+          >
+            Our Best {' '}
+            <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+              Services
+            </span>
+          </Heading>
+          <Service></Service>
+        </div>
         {/* <Coverage></Coverage> */}
         <About></About>
 

@@ -2,9 +2,9 @@ import { getToken } from 'next-auth/jwt'
 import { NextResponse } from 'next/server'
 
 const privateRoutes = ['/private', '/dashboard', '/secret'];
-const adminOnlyRoutes = ['/dashboard/manage-decorators', '/dashboard/assign-task', '/dashboard/worker-dashboard'];
+const adminOnlyRoutes = ['/dashboard/worker-dashboard','/dashboard/assign-task', 'dashboard/payment-history'];
 const workerOnlyRoutes = ['/dashboard/my-tasks', '/dashboard/earnings'];
-const userOnlyRoutes = ['/dashboard/becomeworker'];
+const userOnlyRoutes = ['/dashboard/becomeworker' , '/dashboard/myBooking', '/dashboard/payment'];
 
 // This function can be marked `async` if using `await` inside
 export async function proxy(req) {

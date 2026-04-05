@@ -83,7 +83,7 @@ const Navbar = () => {
                             </div>
                             
                             {/* Dashboard Button */}
-                            <div className="tooltip tooltip-bottom hidden md:block" data-tip="Dashboard">
+                            <div className="tooltip tooltip-bottom hidden md:block">
                                 <DashBoard />
                             </div>
 

@@ -121,20 +121,23 @@ const DashBoardLayout = ({ children }) => {
     const commonItems = [
       { href: "/", icon: Icons.Home, label: "Home" },
       { href: "/dashboard/profile", icon: Icons.Profile, label: "Profile" },
-      { href: "/dashboard/myBooking", icon: Icons.Booking, label: "My Bookings" },
-      { href: "/dashboard/payment", icon: Icons.Payment, label: "Payments" },
+
     ];
 
     const roleSpecificItems = {
       admin: [
-        { href: "/dashboard/manage-decorators", icon: Icons.Worker, label: "Decorator Management" },
+        { href: "/dashboard/manage-service", icon: Icons.Task, label: "Manage Service" },
+        { href: "/dashboard/payment-history", icon: Icons.Payment, label: "Payments history" },
         { href: "/dashboard/assign-task", icon: Icons.Task, label: "Assign Tasks" },
         { href: "/dashboard/worker-dashboard", icon: Icons.Worker, label: "Worker Dashboard" },
       ],
       user: [
+        { href: "/dashboard/myBooking", icon: Icons.Booking, label: "My Bookings" },
+        { href: "/dashboard/payment", icon: Icons.Payment, label: "Payments" },
         { href: "/dashboard/becomeworker", icon: Icons.Worker, label: "Apply as Worker" },
       ],
       worker: [
+        { href: "/dashboard/total-payment", icon: Icons.Payment, label: "Total Payments" },
         { href: "/dashboard/my-tasks", icon: Icons.Task, label: "My Tasks" },
         { href: "/dashboard/earnings", icon: Icons.Payment, label: "Earnings" },
       ],
@@ -235,8 +238,8 @@ const DashBoardLayout = ({ children }) => {
             >
               <Icons.Logout />
               {!isCollapsed && (
-                
-                  <AuthLogin />
+
+                <AuthLogin />
               )}
             </div>
           </div>

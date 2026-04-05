@@ -1,4 +1,5 @@
 'use client';
+import { createCheckoutSession } from '@/app/api/create-checkout-session/route';
 import React, { useState } from 'react';
 
 const Pay = ({ booking, paid }) => {
@@ -8,31 +9,26 @@ const Pay = ({ booking, paid }) => {
         setLoading(true);
 
         try {
-            const res = await fetch('/api/create-checkout-session', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(booking)
-            });
-
-            const result = await res.json();
-
+            const result = await createCheckoutSession(booking);
+            
             if (result.success && result.url) {
+                // Stripe checkout page e redirect
                 window.location.href = result.url;
             } else {
-                alert(result.message);
+                alert(result.message || 'Payment failed');
             }
+
         } catch (err) {
             console.error(err);
+            alert('Something went wrong');
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <button 
-            onClick={handlePayment} 
+        <button
+            onClick={handlePayment}
             disabled={loading || paid}
             className="btn btn-outline btn-secondary"
         >

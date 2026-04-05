@@ -5,23 +5,23 @@ import { stripe } from "@/lib/stripe";
 
 export async function createCheckoutSession(booking) {
   try {
-    // Step 1: MongoDB te pending payment record banaw
+    // Payment record create koro
     const paymentResult = await createPayment({
       serviceId: booking.serviceId || booking._id,
       userId: booking.userId,
       totalAmount: booking.totalAmount || booking.amount,
-      paymentMethod: 'stripe',
     });
 
     if (!paymentResult.acknowledged) {
       return { success: false, message: paymentResult.message };
     }
 
-    const paymentId = paymentResult.insertedId.toString();
+    const paymentId = paymentResult.insertedId;
 
-    // Step 2: Stripe Checkout Session create
+    // Stripe session create koro
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
+      payment_method_types: ['card'],
       line_items: [
         {
           price_data: {
@@ -29,13 +29,13 @@ export async function createCheckoutSession(booking) {
             product_data: {
               name: booking.serviceName || booking.title || 'Service Payment',
             },
-            unit_amount: Math.round(Number(booking.totalAmount || booking.amount) * 100), // paisa e convert
+            unit_amount: Math.round(Number(booking.totalAmount || booking.amount) * 100),
           },
           quantity: 1,
         },
       ],
       metadata: {
-        paymentId: paymentId,
+        paymentId: paymentId.toString(), // Ei ID ta success page e pabo
         userId: booking.userId,
         serviceId: booking.serviceId || booking._id,
       },
@@ -43,7 +43,6 @@ export async function createCheckoutSession(booking) {
       cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/cancel`,
     });
 
-    // Important: Redirect directly from server action
     return { 
       success: true, 
       url: session.url 
@@ -53,7 +52,7 @@ export async function createCheckoutSession(booking) {
     console.error('Checkout error:', error);
     return { 
       success: false, 
-      message: error.message || 'Payment session create korte problem hoyeche' 
+      message: error.message || 'Payment session creation failed' 
     };
   }
 }

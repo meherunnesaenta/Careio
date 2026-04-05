@@ -11,7 +11,6 @@ const slides = [
     id: 1,
     image: "/assets/banner/banner1.png",
     title: "Trusted Care for Your Loved Ones",
-    subtitle: "Reliable babysitting, elderly support & special needs care — right at home",
     ctaText: "Book Now",
     ctaLink: "/service",
   },
@@ -19,7 +18,6 @@ const slides = [
     id: 2,
     image: "/assets/banner/banner2.png",
     title: "Multi-Generational Family Happiness",
-    subtitle: "Caring for children and seniors together — safe & joyful moments",
     ctaText: "Explore Services",
     ctaLink: "/login",
   },
@@ -27,7 +25,6 @@ const slides = [
     id: 3,
     image: "/assets/banner/banner3.png",
     title: "Compassionate Elderly Support",
-    subtitle: "Warm companionship & daily assistance for your parents & grandparents",
     ctaText: "Learn More",
     ctaLink: "/service",
   },
@@ -35,7 +32,6 @@ const slides = [
     id: 4,
     image: "/assets/banner/banner4.png",
     title: "Loving Baby & Child Care",
-    subtitle: "Professional nannies creating fun & safe playtime for your little ones",
     ctaText: "Book Baby Care",
     ctaLink: "/service",
   },
@@ -43,7 +39,6 @@ const slides = [
     id: 5,
     image: "/assets/banner/banner5.png",
     title: "Emotional Bonding & Trust",
-    subtitle: "Building strong connections through caring & attentive home services",
     ctaText: "Get Started",
     ctaLink: "/booking",
   },
@@ -98,7 +93,7 @@ const Banner = () => {
   }, []);
 
   return (
-    <div className=" rounded-2xl overflow-hidden shadow-2xl mt-4">
+    <div className=" rounded-2xl overflow-hidden shadow-2xl ">
       <div
         ref={carouselRef}
         className="relative overflow-hidden rounded-2xl"
@@ -148,22 +143,12 @@ const Banner = () => {
                 <div className={`max-w-4xl transition-all duration-700 delay-300 ${
                   currentSlide === slide.id ? 'translate-y-0 opacity-100' : 'translate-y-10 opacity-0'
                 }`}>
-                  {/* Animated Badge */}
-                  <div className="inline-block mb-4 md:mb-6 animate-slideDown">
-                    <span className="px-4 py-1.5 text-xs md:text-sm font-semibold bg-white/10 backdrop-blur-md text-white rounded-full border border-white/30 shadow-lg">
-                      ✨ Trusted Care Since 2024
-                    </span>
-                  </div>
 
                   {/* Animated Title */}
                   <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-bold text-white mb-4 md:mb-6 drop-shadow-2xl leading-tight animate-slideUp">
                     {slide.title}
                   </h2>
 
-                  {/* Animated Subtitle */}
-                  <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-white/90 mb-8 md:mb-10 max-w-2xl mx-auto drop-shadow-lg animate-fadeIn">
-                    {slide.subtitle}
-                  </p>
 
                   {/* Animated CTA Button */}
                   <div className="animate-scaleIn">

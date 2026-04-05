@@ -1,43 +1,25 @@
 'use server';
 const { connect } = require("@/lib/dbconnect");
-
+const { ObjectId } = require('mongodb')
 const paymentCollection = await connect('payment');
 
 export const createPayment = async (payload) => {
-  try {
-    const { serviceId, userId, totalAmount, paymentMethod = 'stripe' } = payload;
+  const { serviceId, userId, totalAmount } = payload;
 
-    if (!serviceId || !userId || !totalAmount) {
-      return { 
-        acknowledged: false, 
-        message: 'Missing required fields' 
-      };
-    }
+  const newPayment = {
+    serviceId,
+    userId,
+    amount: Number(totalAmount),
+    status: 'pending',
+    createdAt: new Date(),
+  };
 
-    const newPayment = {
-      serviceId,
-      userId,
-      amount: Number(totalAmount),
-      paymentMethod,
-      status: 'paid',
-      createdAt: new Date(),
-      // stripeSessionId: null,   // pore webhook e add korbo
-    };
+  const result = await paymentCollection.insertOne(newPayment);
 
-    const result = await paymentCollection.insertOne(newPayment);
-    
-    return {
-      acknowledged: true,
-      insertedId: result.insertedId,
-      message: "Payment record created successfully"
-    };
-  } catch (error) {
-    console.error(error);
-    return {
-      acknowledged: false,
-      message: error.message || "Database error"
-    };
-  }  
+  return {
+    acknowledged: true,
+    insertedId: result.insertedId.toString(),
+  };
 };
 
 export const getPaymentByEmail = async (userId) => {
@@ -65,7 +47,7 @@ export const getPaymentByEmail = async (userId) => {
 };
 
 
-export const  getPayStatus =async (serviceId) => {
+export const getPayStatus = async (serviceId) => {
   try {
     if (!serviceId) {
       return {
@@ -90,5 +72,41 @@ export const  getPayStatus =async (serviceId) => {
       acknowledged: false,
       message: error.message || "Database error"
     };
+  }
+};
+
+export const updatePaymentStatus = async (sessionId) => {
+  try {
+    if (!sessionId) {
+      return { success: false, message: 'Session ID required' };
+    }
+
+    // Stripe theke session details fetch koro
+    const { stripe } = require('@/lib/stripe');
+    const session = await stripe.checkout.sessions.retrieve(sessionId);
+    
+    if (session.payment_status === 'paid') {
+      // Payment table e status update koro
+      const paymentId = session.metadata.paymentId;
+      const result = await paymentCollection.updateOne(
+        { _id: new ObjectId(paymentId) },
+        { 
+          $set: { 
+            status: 'paid',
+            stripeSessionId: sessionId,
+            updatedAt: new Date()
+          } 
+        }
+      );
+      
+      if (result.modifiedCount > 0) {
+        return { success: true, message: 'Payment status updated' };
+      }
+    }
+    
+    return { success: false, message: 'Payment not paid yet' };
+  } catch (error) {
+    console.error('Update error:', error);
+    return { success: false, message: error.message };
   }
 };
