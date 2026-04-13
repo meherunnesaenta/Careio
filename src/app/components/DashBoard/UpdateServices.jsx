@@ -52,11 +52,10 @@ const UpdateServices = ({ id }) => {
       console.log('Loading service with ID:', id);
 
       try {
-        const result = await getSingleService(id);
-        console.log('API Response:', result);
+        const service = await getSingleService(id); // Direct object or null
+        console.log('API Response:', service);
 
-        if (result.success && result.service) {
-          const service = result.service;
+        if (service && service._id) { // Check if service exists
           const newFormData = {
             name: service.name || '',
             category: service.category || '',
@@ -72,7 +71,7 @@ const UpdateServices = ({ id }) => {
             setImagePreview(service.image);
           }
         } else {
-          setError(result.message || 'Service not found');
+          setError('Service not found');
         }
       } catch (err) {
         console.error('Error loading service:', err);
@@ -84,6 +83,10 @@ const UpdateServices = ({ id }) => {
 
     loadService();
   }, [id]);
+
+  // Rest of your code remains the same...
+  // (handleChange, handleReset, handleImageUpload, removeImage, 
+  //  handleFeatureChange, addFeature, removeFeature, handleSubmit, categories)
 
   // Handle input change
   const handleChange = (e) => {

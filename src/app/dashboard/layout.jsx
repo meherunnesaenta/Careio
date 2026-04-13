@@ -1,12 +1,11 @@
 'use client'
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Logo from '../components/layout/Logo';
-import { useSession } from 'next-auth/react';
-import AuthLogin from '../components/Button/AuthLogin';
-import { redirect, usePathname } from 'next/navigation';
+import { useSession, signOut } from 'next-auth/react';
+import { useRouter, usePathname } from 'next/navigation'; // redirect সরিয়ে useRouter ব্যবহার করুন
 
-// Icon components for better organization
+// Icon components (same as before)
 const Icons = {
   Home: () => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5">
@@ -76,35 +75,60 @@ const Icons = {
 };
 
 // Sidebar Item Component
-const SidebarItem = ({ href, icon: Icon, label, isCollapsed }) => (
-  <li>
-    <Link
-      href={href}
-      className={`group relative flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-base-300 ${isCollapsed ? 'justify-center' : ''
-        }`}
-      data-tip={isCollapsed ? label : undefined}
-    >
-      <Icon />
-      {!isCollapsed && <span>{label}</span>}
-    </Link>
-  </li>
-);
+const SidebarItem = ({ href, icon: Icon, label, isCollapsed, pathname }) => {
+  const isActive = pathname === href || pathname?.startsWith(href + '/');
+  
+  return (
+    <li>
+      <Link
+        href={href}
+        className={`group relative flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+          isActive 
+            ? 'bg-primary text-white' 
+            : 'hover:bg-base-300'
+        } ${isCollapsed ? 'justify-center' : ''}`}
+        data-tip={isCollapsed ? label : undefined}
+      >
+        <Icon />
+        {!isCollapsed && <span>{label}</span>}
+      </Link>
+    </li>
+  );
+};
 
 // Sidebar Section Component
-const SidebarSection = ({ items, isCollapsed }) => (
+const SidebarSection = ({ items, isCollapsed, pathname }) => (
   <ul className="menu w-full space-y-1 p-2">
     {items.map((item, index) => (
-      <SidebarItem key={index} {...item} isCollapsed={isCollapsed} />
+      <SidebarItem 
+        key={index} 
+        {...item} 
+        isCollapsed={isCollapsed}
+        pathname={pathname}
+      />
     ))}
   </ul>
 );
 
 const DashBoardLayout = ({ children }) => {
   const { data: session, status } = useSession();
-  const [isCollapsed, setIsCollapsed] = React.useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isAuthorized, setIsAuthorized] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
 
-  if (status === 'loading') {
+  // useEffect এর মাধ্যমে রিডাইরেক্ট হ্যান্ডেল করুন
+  useEffect(() => {
+    if (status === 'loading') return;
+    
+    if (!session) {
+      router.push(`/login?callbackUrl=${encodeURIComponent(pathname)}`);
+    } else {
+      setIsAuthorized(true);
+    }
+  }, [session, status, pathname, router]);
+
+  if (status === 'loading' || !isAuthorized) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="loading loading-spinner loading-lg"></div>
@@ -113,21 +137,24 @@ const DashBoardLayout = ({ children }) => {
   }
 
   if (!session) {
-    redirect(`/login?callbackUrl=${pathname}`);
+    return null; 
   }
 
-  // Navigation items based on user role
+
+  console.log("Session user:", session.user);
+  console.log("User role:", session.user?.role);
+
+  // Navigation items based on user role with fallback
   const getNavItems = () => {
     const commonItems = [
       { href: "/", icon: Icons.Home, label: "Home" },
       { href: "/dashboard/profile", icon: Icons.Profile, label: "Profile" },
-
     ];
 
     const roleSpecificItems = {
       admin: [
         { href: "/dashboard/manage-service", icon: Icons.Task, label: "Manage Service" },
-        { href: "/dashboard/payment-history", icon: Icons.Payment, label: "Payments history" },
+        { href: "/dashboard/payment-history", icon: Icons.Payment, label: "Payments History" },
         { href: "/dashboard/assign-task", icon: Icons.Task, label: "Assign Tasks" },
         { href: "/dashboard/worker-dashboard", icon: Icons.Worker, label: "Worker Dashboard" },
       ],
@@ -143,32 +170,37 @@ const DashBoardLayout = ({ children }) => {
       ],
     };
 
-    let role = session?.role;
+    // Get role from session with fallback to 'user'
+    let role = session?.user?.role || session?.role || 'user';
+    console.log("Using role:", role);
+    
     let items = [...commonItems];
 
-    if (role === 'admin') items.push(...roleSpecificItems.admin);
-    else if (role === 'user') items.push(...roleSpecificItems.user);
-    else if (role === 'worker') items.push(...roleSpecificItems.worker);
+    if (role === 'admin') {
+      items.push(...roleSpecificItems.admin);
+    } else if (role === 'worker') {
+      items.push(...roleSpecificItems.worker);
+    } else {
+      // Default to user role
+      items.push(...roleSpecificItems.user);
+    }
 
     return items;
   };
 
   const navItems = getNavItems();
+  console.log("Nav items:", navItems);
 
-  if (status === "loading") {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="loading loading-spinner loading-lg"></div>
-      </div>
-    );
-  }
+  const handleLogout = async () => {
+    await signOut({ callbackUrl: '/' });
+  };
 
   return (
     <div className="drawer lg:drawer-open">
       <input id="my-drawer-4" type="checkbox" className="drawer-toggle" />
 
       <div className="drawer-content flex flex-col">
-        {/* Enhanced Navbar */}
+        {/* Navbar */}
         <nav className="navbar sticky top-0 z-30 bg-base-100 shadow-md">
           <div className="flex-none lg:hidden">
             <label htmlFor="my-drawer-4" aria-label="open sidebar" className="btn btn-square btn-ghost">
@@ -180,7 +212,22 @@ const DashBoardLayout = ({ children }) => {
             <Logo />
           </div>
 
-
+          {/* User info in navbar */}
+          <div className="flex-none">
+            <div className="dropdown dropdown-end">
+              <div tabIndex={0} role="button" className="btn btn-ghost btn-circle avatar">
+                <div className="w-10 rounded-full bg-primary text-primary-content flex items-center justify-center">
+                  <span className="text-lg font-bold">
+                    {session?.user?.name?.[0] || session?.user?.email?.[0] || 'U'}
+                  </span>
+                </div>
+              </div>
+              <ul tabIndex={0} className="mt-3 z-[1] p-2 shadow menu menu-sm dropdown-content bg-base-100 rounded-box w-52">
+                <li><Link href="/dashboard/profile">Profile</Link></li>
+                <li><button onClick={handleLogout}>Logout</button></li>
+              </ul>
+            </div>
+          </div>
         </nav>
 
         {/* Main Content */}
@@ -191,18 +238,17 @@ const DashBoardLayout = ({ children }) => {
         </main>
       </div>
 
-      {/* Enhanced Sidebar */}
+      {/* Sidebar */}
       <div className="drawer-side">
         <label htmlFor="my-drawer-4" aria-label="close sidebar" className="drawer-overlay"></label>
 
-        <div className={`flex flex-col h-full bg-base-100 shadow-xl transition-all duration-300 ${isCollapsed ? 'w-20' : 'w-64'
-          }`}>
-          {/* Sidebar Header with Collapse Toggle */}
+        <div className={`flex flex-col h-full bg-base-100 shadow-xl transition-all duration-300 ${isCollapsed ? 'w-20' : 'w-64'}`}>
+          {/* Sidebar Header */}
           <div className="flex items-center justify-between p-4 border-b border-base-300">
             {!isCollapsed && (
               <div className="font-bold text-xl">
                 <span className="bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-                  Menu
+                  Dashboard
                 </span>
               </div>
             )}
@@ -216,8 +262,7 @@ const DashBoardLayout = ({ children }) => {
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2"
-                className={`w-4 h-4 transition-transform duration-300 ${isCollapsed ? 'rotate-180' : ''
-                  }`}
+                className={`w-4 h-4 transition-transform duration-300 ${isCollapsed ? 'rotate-180' : ''}`}
               >
                 <polyline points="15 18 9 12 15 6" />
               </svg>
@@ -226,22 +271,27 @@ const DashBoardLayout = ({ children }) => {
 
           {/* Navigation Items */}
           <div className="flex-1 overflow-y-auto py-4">
-            <SidebarSection items={navItems} isCollapsed={isCollapsed} />
+            {navItems.length > 0 ? (
+              <SidebarSection items={navItems} isCollapsed={isCollapsed} pathname={pathname} />
+            ) : (
+              <div className="text-center text-base-content/60 p-4">
+                No menu items available
+              </div>
+            )}
           </div>
 
-          {/* Footer with Logout */}
+          {/* Footer with Logout Button */}
           <div className="p-4 border-t border-base-300">
-            <div
-              className={`group relative flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-error/10 hover:text-error cursor-pointer ${isCollapsed ? 'justify-center' : ''
-                }`}
+            <button
+              onClick={handleLogout}
+              className={`group relative flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 hover:bg-error/10 hover:text-error w-full ${
+                isCollapsed ? 'justify-center' : ''
+              }`}
               data-tip={isCollapsed ? "Logout" : undefined}
             >
               <Icons.Logout />
-              {!isCollapsed && (
-
-                <AuthLogin />
-              )}
-            </div>
+              {!isCollapsed && <span>Logout</span>}
+            </button>
           </div>
         </div>
       </div>

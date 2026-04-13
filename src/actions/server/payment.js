@@ -110,3 +110,8 @@ export const updatePaymentStatus = async (sessionId) => {
     return { success: false, message: error.message };
   }
 };
+
+export const getAllPayment= async()=>{
+  const result = await paymentCollection.find().toArray();
+  return result;
+}
